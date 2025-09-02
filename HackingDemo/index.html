@@ -1,0 +1,1479 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Breach Protocol – Mini‑game</title>
+  <link rel="stylesheet" href="https://unpkg.com/augmented-ui@2/augmented-ui.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@300;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://unpkg.com/handsfree@8.5.1/build/lib/assets/handsfree.css">
+  <style>
+    /* Fonte carregada via Google Fonts no <head>; @font-face local removido */
+    body {
+      background: #000000;
+      color: #eaff00;
+      font-family: 'ChakraPetch', monospace !important;
+      margin: 0;
+      padding: 0;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+    * {
+      font-family: 'ChakraPetch', monospace !important;
+    }
+    .bp-topbar {
+      display: flex;
+      flex-direction: row;
+      align-items: stretch;
+      background: #000000;
+      border-bottom: 3px solid #eaff00;
+      box-shadow: none;
+      padding: 0 0 0 0;
+      height: 70px;
+      position: relative;
+      z-index: 2;
+    }
+    .bp-timer-block {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      border-right: 3px solid #eaff00;
+      padding: 0 32px;
+      min-width: 420px;
+      height: 100%;
+      background: #000000;
+    }
+    .bp-timer-label {
+      font-size: 1.1em;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      color: #eaff00;
+      margin-right: 24px;
+      text-transform: uppercase;
+      width: 240px;
+      min-width: 240px;
+      max-width: 240px;
+      display: inline-block;
+      text-align: left;
+    }
+    .bp-timer-bar {
+      flex: 1;
+      height: 14px;
+      background: #181c22;
+      border-radius: 7px;
+      margin-right: 24px;
+      overflow: hidden;
+      position: relative;
+      border: 2px solid #eaff00;
+      min-width: 120px;
+    }
+    .bp-timer-bar-inner {
+      background: linear-gradient(90deg, #eaff00 0%, #eaff00 100%);
+      height: 100%;
+      width: 100%;
+      transition: width 0.2s;
+    }
+    .bp-timer-value {
+      font-size: 1.5em;
+      font-weight: 900;
+      color: #eaff00;
+      width: 90px;
+      min-width: 90px;
+      max-width: 90px;
+      text-align: right;
+      letter-spacing: 0.1em;
+    }
+    .bp-buffer-block {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      padding: 0 32px;
+      min-width: 340px;
+      height: 100%;
+      background: #000000;
+      border-right: 3px solid #eaff00;
+    }
+    .bp-buffer-label {
+      color: #eaff00;
+      font-size: 1.1em;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      opacity: 0.7;
+      margin-right: 18px;
+      text-transform: uppercase;
+    }
+    .bp-buffer-boxes {
+      display: flex;
+      flex-direction: row;
+      gap: 8px;
+    }
+    .bp-buffer-box {
+      width: 2.5em;
+      height: 2.5em;
+      background: #000000;
+      border: 2px solid #eaff00;
+      color: #eaff00;
+      font-size: 1.1em;
+      font-family: 'Orbitron', monospace;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      border-radius: 4px;
+    }
+    .bp-mainarea {
+      display: flex;
+      flex-direction: row;
+      align-items: flex-start;
+      justify-content: flex-start;
+      margin: 32px 48px 0 48px;
+      gap: 32px;
+    }
+    .bp-matrix-panel {
+      background: #000000;
+      border: 2px solid #eaff00;
+      box-shadow: none;
+      min-width: 520px;
+      max-width: 600px;
+      flex: 0 0 520px;
+      display: flex;
+      flex-direction: column;
+    }
+    .bp-matrix-area {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      background: #000000;
+    }
+    .bp-seq-area {
+      padding: 1px 24px;
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      gap: 24px;
+      border: none;
+      background: #000000;
+      margin: 0;
+      height: 24px;
+    }
+    [data-augmented-ui] {
+      --aug-border-all: 2px;
+      --aug-border-bg: #eaff00;
+      --aug-br-width: 20px;
+      --aug-br-height: 20px;
+    }
+    [data-augmented-ui~="br-clip border"] {
+      --aug-border: initial;
+      --aug-border-all: 2px;
+      --aug-border-bg: #eaff00;
+      --aug-br-width: 20px;
+      --aug-br-height: 20px;
+    }
+    .bp-section-label {
+      background: #000000;
+      color: #eaff00;
+      font-size: 1.1em;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      padding: 12px 24px;
+      border-bottom: 3px solid #eaff00;
+      text-transform: uppercase;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .bp-matrix-labels {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-right: 8px;
+    }
+    .bp-matrix-label {
+      color: #eaff00;
+      font-size: 0.9em;
+      opacity: 0.7;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      height: 2.5em;
+      display: flex;
+      align-items: center;
+    }
+    table.matrix {
+      border-collapse: separate;
+      border-spacing: 2px;
+      background: #000000;
+      border: none;
+      box-shadow: none;
+    }
+    table.matrix td {
+      width: 3.2em;
+      height: 2.5em;
+      text-align: center;
+      cursor: pointer;
+      border: none;
+      font-size: 1.1em;
+      font-family: 'Orbitron', monospace;
+      color: #eaff00;
+      background: #000000;
+      transition: background 0.2s, color 0.2s;
+      padding: 0;
+    }
+    .rowOk { 
+      background: #292c3b !important; 
+    }
+    .colOk { 
+      background: #292c3b !important; 
+      color: #eaff00; 
+    }
+    .hintRow { 
+      background: #1f201a !important; 
+    }
+    .hintCol { 
+      background: #1f201a !important; 
+    }
+    .sel {
+      pointer-events: none;
+      border-color: #fff;
+      background: #eaff00;
+      color: #181c22;
+    }
+    .sel::before { content: "["; }
+    .sel::after { content: "]"; }
+    .ok { color: #0f0; }
+    .fail { color: #f00; }
+    .bp-hacks-panel {
+      background: #000000;
+      border: none;
+      box-shadow: none;
+      min-width: 480px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      padding: 0;
+    }
+    .bp-hacks-label {
+      background: #000000;
+      color: #eaff00;
+      font-size: 1.1em;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      padding: 12px 48px;
+      margin: 0;
+      border-bottom: 3px solid #eaff00;
+      text-transform: uppercase;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .bp-hack-list {
+      padding: 10px 0;
+      width: 100%;
+    }
+    .bp-hack-item,
+    .bp-hack-success-box {
+      display: grid;
+      grid-template-columns: clamp(90px, 25%, 250px) 40px 1fr;
+      grid-template-rows: auto auto;
+      column-gap: 12px;
+      align-items: center;
+      padding: 8px 20px;
+      margin: 6px 24px;
+    }
+    .bp-hack-item[data-augmented-ui] {
+      --aug-border-bg: #181c22 !important;
+      --aug-border-all: 2px;
+    }
+    .bp-hack-item.failed-seq {
+      background: #ea575d !important;
+    }
+    .bp-hack-item.success-seq {
+      background: #1cd577 !important;
+    }
+    .bp-hack-item.failed-seq .bp-hack-seq,
+    .bp-hack-item.failed-seq .bp-hack-title,
+    .bp-hack-item.failed-seq .bp-hack-desc {
+      color: #32030b !important;
+    }
+    .bp-hack-item.failed-seq .bp-hack-icon {
+      border-color: #32030b;
+      color: #32030b;
+    }
+    .bp-hack-item.failed-seq svg polygon {
+      fill: #32030b !important;
+    }
+    .bp-hack-item.success-seq .bp-hack-seq,
+    .bp-hack-item.success-seq .bp-hack-title,
+    .bp-hack-item.success-seq .bp-hack-desc {
+      color: #14251b !important;
+    }
+    .bp-hack-item.success-seq .bp-hack-icon {
+      border-color: #14251b;
+      color: #14251b;
+    }
+    .bp-hack-item.success-seq svg polygon {
+      fill: #14251b !important;
+    }
+    .bp-hack-icon {
+      width: 32px;
+      height: 32px;
+      background: transparent;
+      border: 2px solid #eaff00;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.3em;
+      color: #eaff00;
+      margin-top: 2px;
+    }
+    .bp-hack-info {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      text-align: left;
+      justify-content: center;
+    }
+    .bp-hack-title {
+      color: #eaff00;
+      font-size: 1.1em;
+      font-weight: 900;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+    .bp-hack-desc {
+      color: #eaff00;
+      font-size: 1em;
+      opacity: 0.8;
+      font-weight: 400;
+    }
+    .bp-seq-area {
+      padding: 1px 24px;
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      gap: 24px;
+      border-top: none;
+      background: #000000;
+      margin-top: 0;
+      height: 24px;
+    }
+    .bp-seq-label {
+      color: #eaff00;
+      font-size: 1.1em;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      opacity: 0.7;
+      margin-right: 12px;
+      text-transform: uppercase;
+    }
+    .bp-seq-codes {
+      font-size: 1.3em;
+      color: #eaff00;
+      background: #000000;
+      border: 2px solid #eaff00;
+      border-radius: 4px;
+      padding: 8px 24px;
+      font-family: 'Orbitron', monospace;
+      font-weight: 900;
+      letter-spacing: 0.2em;
+      margin-right: 24px;
+    }
+    .bp-upload-btn, .bp-restart-btn, .exit-btn {
+      background: #0a0a0a;
+      color: #ffe600;
+      border: none;
+      font-family: 'ChakraPetch', 'Orbitron', monospace;
+      font-size: 1.1em;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      box-shadow: 0 0 8px #ffe60088, 0 0 0 #0000;
+      padding: 12px 36px;
+      margin: 18px 8px 0 0;
+      cursor: pointer;
+      position: relative;
+      transition: background 0.2s, color 0.2s, box-shadow 0.2s;
+      outline: none;
+      --aug-border-all: 2.5px;
+      --aug-border-bg: #ffe600;
+      --aug-tl-clip: 18px;
+      --aug-br-clip: 18px;
+    }
+    .bp-upload-btn[data-augmented-ui], .bp-restart-btn[data-augmented-ui], .exit-btn[data-augmented-ui] {
+      --aug-border-all: 2.5px;
+      --aug-border-bg: #ffe600;
+      --aug-tl-clip: 18px;
+      --aug-br-clip: 18px;
+    }
+    .bp-upload-btn:hover, .bp-restart-btn:hover, .exit-btn:hover {
+      background: #ffe600;
+      color: #0a0a0a;
+      box-shadow: 0 0 16px #ffe600cc, 0 0 0 #0000;
+    }
+    .hide { display: none; }
+    .win, .failbox {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 3em;
+      font-weight: bold;
+      background: rgba(16, 19, 26, 0.95);
+      border: 4px solid #0f0;
+      padding: 32px 48px;
+      z-index: 100;
+      font-family: 'Orbitron', monospace;
+      letter-spacing: 2px;
+      text-shadow: none;
+      border-radius: 8px;
+      box-shadow: none;
+      color: #0f0;
+    }
+    .failbox {
+      border: 4px solid #f00;
+      color: #f00;
+      text-shadow: none;
+      box-shadow: none;
+    }
+    .cyber-aug {
+      --aug-border-all: 2.5px;
+      --aug-border-bg: #eaff00;
+      --aug-inlay-all: 8px;
+      --aug-inlay-bg: #181c22;
+      --aug-inlay-opacity: 0.7;
+      background: #181c22;
+      color: #eaff00;
+      padding: 0;
+    }
+    .panel-header {
+      background: #eaff00;
+      color: #000000;
+      font-weight: bold;
+      padding: 10px 24px;
+      font-size: 1.1em;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+    .success-seq * {
+      color: #181c22 !important;
+      fill: #181c22 !important;
+    }
+    .success-seq svg polygon {
+      fill: #181c22 !important;
+    }
+    .cmd-terminal {
+      background: #00ff99;
+      color: #181c22;
+      font-family: 'ChakraPetch', monospace;
+      font-size: 1.1em;
+      padding: 32px 24px 24px 24px;
+      min-height: 320px;
+      border-radius: 8px;
+      margin: 32px auto 0 auto;
+      width: 100%;
+      max-width: 600px;
+      box-shadow: none;
+      white-space: pre-line;
+      border: 2px solid #00ff99;
+      text-align: left;
+      position: relative;
+    }
+    .cmd-header {
+      background: #00ff99;
+      color: #181c22;
+      font-weight: bold;
+      padding: 10px 24px 8px 24px;
+      font-size: 1.1em;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      border-bottom: 2px solid #00ff99;
+      margin: -32px -24px 24px -24px;
+      border-radius: 8px 8px 0 0;
+      font-family: 'ChakraPetch', monospace;
+    }
+    .exit-btn {
+      background: #00ff99;
+      color: #181c22;
+      font-family: 'ChakraPetch', monospace;
+      font-size: 1.2em;
+      font-weight: bold;
+      border: none;
+      border-radius: 6px;
+      padding: 16px 48px;
+      margin: 32px auto 0 auto;
+      display: block;
+      cursor: pointer;
+      box-shadow: none;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      transition: background 0.2s, color 0.2s;
+    }
+    .exit-btn:hover {
+      background: #181c22;
+      color: #00ff99;
+      border: 2px solid #00ff99;
+    }
+    .cmd-terminal-success {
+      background: #0b2e1a;
+      color: #00ff99;
+      padding: 0 0 0 0;
+      min-height: 320px;
+      max-width: 600px;
+      width: 100%;
+      border: 2.5px solid #00ff99;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      align-items: stretch;
+    }
+    /* ===== NOVO LAYOUT PARA O PAINEL DE SEQUÊNCIAS ===================== */
+    .bp-hack-success-box * { color:#181c22!important; fill:#181c22!important; }
+    @media(max-width:700px){
+      .bp-hack-success-box{grid-template-columns:1fr;row-gap:12px;text-align:center;padding:18px 24px;}
+    }
+    @media(max-width: 600px) {
+      .bp-hack-item,
+      .bp-hack-success-box {
+        grid-template-columns: clamp(70px, 40%, 180px) 32px 1fr;
+      }
+      .bp-hack-icon {
+        width: 28px;
+        height: 28px;
+        font-size: 1em;
+      }
+      .bp-hacks-panel {
+        margin-left: 6px;
+        margin-right: 6px;
+        box-sizing: border-box;
+      }
+    }
+    @media (max-width: 480px) {
+      /* Caixas de hack não cortam nas laterais */
+      .bp-hack-item, .bp-hack-success-box {
+        grid-template-columns: 1fr !important;
+        grid-template-rows: auto auto auto;
+        padding: 8px 2px;
+        margin: 8px 2px;
+        row-gap: 8px;
+        box-sizing: border-box;
+        width: 100%;
+        max-width: 100vw;
+      }
+      /* Buffer menor */
+      .bp-buffer-box {
+        width: 1.6em;
+        height: 1.6em;
+        font-size: 0.9em;
+        margin: 0 2px;
+      }
+      /* Matrix panel com margens menores */
+      .bp-matrix-panel {
+        min-width: 0;
+        max-width: 100vw;
+        margin: 0 2px;
+        box-sizing: border-box;
+      }
+      .bp-matrix-area {
+        padding: 8px 2px;
+      }
+      .panel-header {
+        padding: 8px 8px;
+        font-size: 1em;
+      }
+      /* Timer mais compacto */
+      .bp-timer-block {
+        min-width: 0;
+        padding: 0 8px;
+      }
+      .bp-timer-label {
+        width: auto;
+        min-width: 0;
+        max-width: 100vw;
+        margin-right: 8px;
+        font-size: 0.95em;
+      }
+      .bp-timer-bar {
+        min-width: 0;
+        margin-right: 8px;
+        height: 10px;
+      }
+      .bp-timer-value {
+        width: 60px;
+        min-width: 60px;
+        max-width: 60px;
+        font-size: 1em;
+      }
+      .bp-hack-list {
+        margin: 0 8px;
+      }
+      .bp-hacks-panel {
+        margin-left: 4px;
+        margin-right: 4px;
+        box-sizing: border-box;
+      }
+    }
+    /* === EXIT BUTTON – CYBERPUNK STYLE (inspired by buttons_xAjLD) === */
+    .exit-btn-success {
+      background: transparent;
+      color: #00ff99;
+      font-family: 'ChakraPetch', monospace;
+      font-size: 1.2em;
+      font-weight: bold;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      padding: 16px 48px;
+      border: 2px solid #00ff99;
+      cursor: pointer;
+      position: fixed;
+      right: 48px;
+      bottom: 48px;
+      z-index: 200;
+      transition: background 0.2s, color 0.2s, box-shadow 0.2s;
+      /* augmented-ui rectangular clips */
+      --aug-border-all: 2px;
+      --aug-border-bg: #00ff99;
+      --aug-br-clip: 18px;
+    }
+
+    .exit-btn-success:hover {
+      background: #00ff99;
+      color: #0b2e1a;
+      box-shadow: 0 0 12px #00ff99aa;
+    }
+
+    .exit-btn-fail {
+      background: transparent;
+      color: #f00;
+      font-family: 'ChakraPetch', monospace;
+      font-size: 1.2em;
+      font-weight: bold;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      padding: 16px 48px;
+      border: 2px solid #f00;
+      cursor: pointer;
+      position: fixed;
+      right: 48px;
+      bottom: 48px;
+      z-index: 200;
+      transition: background 0.2s, color 0.2s, box-shadow 0.2s;
+      --aug-border-all: 2px;
+      --aug-border-bg: #f00;
+      --aug-br-clip: 18px;
+    }
+
+    .exit-btn-fail:hover {
+      background: #f00;
+      color: #2b0000;
+      box-shadow: 0 0 12px #ff0000aa;
+    }
+    .toggle-btn {
+      position: relative;
+      background: #444444; /* Cor de fundo padrão */
+      color: #ffffff; /* Cor do texto padrão */
+      border: 2px solid #666666; /* Cor da borda padrão */
+      border-radius: 20px;
+      font-family: "'ChakraPetch', monospace";
+      font-weight: bold;
+      font-size: 0.9em;
+      padding: 8px 16px 8px 40px; /* Espaço para o switch */
+      margin: 0 24px 12px 24px;
+      cursor: pointer;
+      width: 180px;
+      text-align: center;
+      transition: background-color 0.3s;
+    }
+    .toggle-btn.active {
+      background: #00c853; /* Verde para "ON" */
+      color: #000000;
+      border-color: #00c853;
+    }
+    .toggle-btn .toggle-switch {
+      position: absolute;
+      left: 4px; /* Posição inicial do switch */
+      top: 4px;
+      width: 24px;
+      height: 24px;
+      background: #ffffff;
+      border-radius: 50%;
+      transition: left 0.3s;
+    }
+    /* Novo estilo para o container do Toggle, alinhado com a identidade visual */
+    .toggle-container {
+      display: flex;
+      align-items: center;
+      background: #000000;
+      border: 2px solid #eaff00;
+      border-radius: 6px;
+/*      margin: 0 24px 12px 24px; */
+      padding: 8px 12px;
+      cursor: pointer;
+      font-family: "'ChakraPetch', monospace";
+      font-size: 0.9em;
+      color: #eaff00;
+      width: 180px;
+      box-sizing: border-box;
+    }
+    .toggle-container .toggle-switch-visual {
+      position: relative;
+      width: 44px;
+      height: 24px;
+      background: #444;
+      border-radius: 12px;
+      margin-right: 12px;
+      transition: background-color 0.3s;
+    }
+    .toggle-container .toggle-switch-visual::before {
+      content: '';
+      position: absolute;
+      top: 2px;
+      left: 2px;
+      width: 20px;
+      height: 20px;
+      background: #fff;
+      border-radius: 50%;
+      transition: left 0.3s;
+      pointer-events: none; /* Garante que o clique seja no container */
+    }
+    .toggle-container.active .toggle-switch-visual {
+      background: #00c853;
+    }
+    .toggle-container.active .toggle-switch-visual::before {
+      left: 22px;
+    }
+    /* Footer abaixo da bp-mainarea para webcam + toggle */
+    #handsfree-footer {
+      display: flex;
+      flex-direction: row;
+      align-items: flex-start;
+      gap: 32px;
+      margin: 24px 48px 0 48px;
+    }
+
+    /* Mini-feed largura 266px (4:3 para 200px alt) */
+    #mini-feed { flex: 0 0 266px; max-width:266px; }
+
+    /* Wrapper empilha toggle + gif verticalmente */
+   .toggle-gif-wrapper{display:flex;flex-direction:column;align-items:center;gap:6px;}
+   #gestureTutorial{width:150px;transform:scaleX(1);}
+
+    /* Cantos retos para mini-feed, toggle e buffer boxes */
+    #mini-feed,
+    .toggle-container,
+    .bp-buffer-box {
+      border-radius: 0 !important;
+    }
+  </style>
+</head>
+<body>
+  <div class="bp-topbar">
+    <div class="bp-timer-block">
+      <div class="bp-timer-label">TIME REMAINING</div>
+      <div class="bp-timer-bar">
+        <div class="bp-timer-bar-inner"></div>
+      </div>
+      <div class="bp-timer-value" id="tVal">30.00</div>
+    </div>
+    <div class="bp-buffer-block">
+      <div class="bp-buffer-label">BUFFER</div>
+      <div class="bp-buffer-boxes"></div>
+    </div>
+  </div>
+  <div class="bp-mainarea">
+    <div class="bp-matrix-panel" data-augmented-ui="br-clip border">
+      <div class="panel-header">CODE MATRIX</div>
+      <div class="bp-matrix-area">
+        <div class="bp-matrix-labels" id="matrixRowLabels"></div>
+  <table id="grid" class="matrix"></table>
+      </div>
+    </div>
+    <div class="bp-hacks-panel" data-augmented-ui="br-clip border">
+      <div class="bp-hacks-label">SEQUENCE REQUIRED TO UPLOAD</div>
+      <div class="bp-hack-list" id="hackList">
+        <!-- Hacks will be rendered aqui pelo JS -->
+      </div>
+    </div>
+  </div>
+  <!-- Handsfree Footer -->
+  <div id="handsfree-footer"><div id="mini-feed"><canvas id="mini-canvas"></canvas></div>
+    <div class="toggle-gif-wrapper">
+      <div class="toggle-container active">
+        <div class="toggle-switch-visual"></div>
+        <span class="toggle-text">Handsfree ON</span>
+      </div>
+      <img id="gestureTutorial" src="Assets/click_tutorial_V2.gif" alt="Hand click tutorial">
+    </div>
+  </div>
+  <div id="winMsg" class="hide win">ACCESS&nbsp;GRANTED</div>
+  <div id="failMsg" class="hide failbox">ACCESS&nbsp;DENIED</div>
+<script>
+/* === CONSTANTES E SEQUÊNCIAS ============================================ */
+const MATRIX = 5;               // dimensão da grade (5 x 5)
+const SEQUENCES = [
+  { seq: ['55','1C'], bonus: 3, label: '+3' },
+  { seq: ['1C','1C','E9'], bonus: 6, label: '+6' },
+  { seq: ['BD','E9','55'], bonus: 9, label: '+9' }
+];
+const BUFFER_MAX = 8;           // tamanho do buffer (igual ao maior seq)
+const CODES  = ['1C','55','BD','E9'];
+
+/* === VARIÁVEIS DE ESTADO ================================================ */
+let buffer   = [];              // códigos já inseridos
+let nextKind = 'row';           // onde POSSO clicar agora ('row' ou 'col')
+let idx      = 0;               // índice da linha/coluna ativa
+let time     = 30.00;           // cronômetro (segundos)
+let timeInit = time;            // tempo inicial para controle da barra
+let timer    = null;            // id do setInterval
+let gameEnded = false;          // flag para impedir múltiplas validações
+
+/* === ATALHO DOM ========================================================= */
+const $ = id => document.getElementById(id);
+const grid = $('grid');
+
+/* ======================================================================== */
+/*  GERAÇÃO DA GRADE – SEMPRE resolvível                                    */
+/* ======================================================================== */
+function buildMatrix(){
+  grid.innerHTML = '';
+  // Matriz fixa fornecida
+  const codesArr = [
+    ['1C','E9','1C','55','1C'],
+    ['E9','55','1C','1C','BD'],
+    ['55','BD','1C','BD','55'],
+    ['55','1C','55','55','1C'],
+    ['E9','1C','1C','1C','55']
+  ];
+  for(let r=0;r<MATRIX;r++){
+    const tr = grid.insertRow();
+    for(let c=0;c<MATRIX;c++){
+      const td = tr.insertCell();
+      td.textContent = codesArr[r][c] || '';
+      td.dataset.row = r;
+      td.dataset.col = c;
+      td.className   = 'cell';
+      td.addEventListener('click'     , () => onPick(td));
+      td.addEventListener('mouseenter', () => showHint(td));
+      td.addEventListener('mouseleave', clearHint);
+    }
+  }
+  for(let i=0;i<BUFFER_MAX;i++) {
+    if(!$('b'+i)) {
+      const box = document.createElement('div');
+      box.className = 'bp-buffer-box';
+      box.id = 'b'+i;
+      box.innerHTML = '&nbsp;';
+      document.querySelector('.bp-buffer-boxes').appendChild(box);
+    }
+  }
+}
+
+/* === REALCE DA LINHA/COL ATIVA ========================================= */
+function highlight(){
+  grid.querySelectorAll('td').forEach(td=>td.classList.remove('rowOk','colOk'));
+  const selector = nextKind==='row'
+        ? `td[data-row="${idx}"]`
+        : `td[data-col="${idx}"]`;
+  grid.querySelectorAll(selector).forEach(td=>
+    td.classList.add(nextKind==='row'? 'rowOk':'colOk')
+  );
+}
+
+/* === PRÉ‑VISUALIZAÇÃO ==================================================== */
+function showHint(td){
+  clearHint();
+  const r = +td.dataset.row, c = +td.dataset.col;
+  if((nextKind==='row'&&r!==idx)||(nextKind==='col'&&c!==idx)) return;
+
+  const futureKind = nextKind==='row'? 'col':'row';
+  const futureIdx  = futureKind==='row'? r:c;
+  const sel = futureKind==='row'
+        ? `td[data-row="${futureIdx}"]`
+        : `td[data-col="${futureIdx}"]`;
+  grid.querySelectorAll(sel).forEach(cell=>
+    cell.classList.add(futureKind==='row'? 'hintRow':'hintCol')
+  );
+}
+function clearHint(){
+  grid.querySelectorAll('.hintRow,.hintCol')
+      .forEach(td=>td.classList.remove('hintRow','hintCol'));
+}
+
+/* === CRONÔMETRO ========================================================= */
+function startTimer(){
+  timer = setInterval(()=>{
+    time -= 0.01; if(time<0) time=0;
+    $('tVal').textContent = time.toFixed(2);
+    document.querySelector('.bp-timer-bar-inner')
+            .style.width = (time / timeInit * 100) + '%';
+    if(!time){ clearInterval(timer); validate(); }
+  },10);
+}
+
+/* === CLIQUE ============================================================= */
+function onPick(td){
+  if(gameEnded) return; // bloqueia após fim do jogo
+
+  const r = +td.dataset.row, c = +td.dataset.col;
+  if((nextKind==='row'&&r!==idx)||(nextKind==='col'&&c!==idx)) return;
+
+  if(!timer) startTimer();
+  clearHint();
+
+  td.classList.add('sel');
+  buffer.push(td.textContent.trim());
+  $('b'+(buffer.length-1)).textContent = td.textContent.trim();
+
+  nextKind = nextKind==='row'? 'col':'row';
+  idx      = nextKind==='row'? r:c;
+  highlight();
+
+  if(buffer.length===BUFFER_MAX) validate();
+}
+
+/* === VALIDAÇÃO ========================================================== */
+function validate(){
+  if(gameEnded) return;
+  gameEnded = true;
+  clearInterval(timer);
+  clearHint();
+  
+  // Checa quantas sequências foram completadas
+  let completed = 0;
+  let completedArr = [];
+  let failedArr = [];
+  
+  for(const [idx, seq] of SEQUENCES.entries()) {
+    const str = seq.seq.join(',');
+    if(buffer.join(',').includes(str)) {
+      completed++;
+      completedArr.push(idx);
+    } else {
+      failedArr.push(idx);
+    }
+  }
+
+  // Feedback visual
+  if(completed > 0) {
+    showSuccessFeedback(completedArr, failedArr);
+  } else {
+    showFailedFeedback();
+  }
+  // Esconde feed e pausa Handsfree
+  hideHandsfree();
+}
+
+/* === INÍCIO E UI HACKS ================================================== */
+function renderHacks() {
+  const list = document.getElementById('hackList');
+  list.innerHTML='';
+  const icons=[`<svg width='32' height='32' viewBox='0 0 32 32'><polygon points='16,4 28,20 4,20' fill='#eaff00'/></svg>`,`<svg width='32' height='32' viewBox='0 0 32 32'><polygon points='16,8 26,22 6,22' fill='#eaff00'/></svg>`,`<svg width='32' height='32' viewBox='0 0 32 32'><polygon points='16,12 24,24 8,24' fill='#eaff00'/></svg>`];
+  const names=['DATAMINE_V1','DATAMINE_V2','DATAMINE_V3'];
+  const descs=['Execute a weak hack against the enemy (Bonus +3)','Execute a moderate hack against the enemy (Bonus +6)','Execute a powerful hack against the enemy (Bonus +9)'];
+  let completed=[]; if(window._bp_completedArr) completed=window._bp_completedArr;
+  SEQUENCES.forEach((seq,i)=>{
+    if(completed.includes(i)){
+      const box=document.createElement('div');
+      box.className='bp-hack-success-box';
+      box.setAttribute('data-augmented-ui', 'br-clip border');
+      box.innerHTML=`<div class='bp-hack-seq'>${seq.seq.join(' ')}</div><div class='bp-hack-icon'>${icons[i]}</div><div class='bp-hack-info'><div class='bp-hack-title'>${names[i]}</div><div class='bp-hack-desc'>${descs[i]}</div></div>`;
+      list.appendChild(box);
+    }else{
+      const div=document.createElement('div');
+      div.className='bp-hack-item';
+      div.setAttribute('data-augmented-ui', 'br-clip border');
+      div.innerHTML=`<div class='bp-hack-seq'>${seq.seq.join(' ')}</div><div class='bp-hack-icon'>${icons[i]}</div><div class='bp-hack-info'><div class='bp-hack-title'>${names[i]}</div><div class='bp-hack-desc'>${descs[i]}</div></div>`;
+      list.appendChild(div);
+    }
+  });
+}
+
+buildMatrix();
+highlight();
+renderHacks();
+
+function showSuccessFeedback(completedArr, failedArr) {
+  window._bp_completedArr = completedArr;
+  // Destaca as sequências acertadas e falhas
+  document.querySelectorAll('.bp-hack-item').forEach((el, idx) => {
+    if (completedArr.includes(idx)) {
+      el.classList.add('success-seq');
+    } else if (failedArr.includes(idx)) {
+      el.classList.add('failed-seq');
+    }
+  });
+
+  // Calcula o bônus total
+  let totalBonus = 0;
+  completedArr.forEach(idx => {
+    totalBonus += SEQUENCES[idx].bonus;
+  });
+  
+  // Adiciona +2 de bônus se todas as sequências foram completadas
+  if (completedArr.length === SEQUENCES.length) {
+    totalBonus += 2; // Bônus extra por completar todas
+  }
+
+  // Substitui o painel verde pelo terminal de sucesso para manter alinhamento
+  const matrixPanel = document.querySelector('.bp-matrix-panel');
+  let terminal = document.querySelector('.cmd-terminal-success');
+  let exitBtn = document.querySelector('.exit-btn-success');
+  if (!terminal) {
+    terminal = document.createElement('div');
+    terminal.className = 'cmd-terminal-success';
+    terminal.style.background = '#0b2e1a';
+    terminal.style.color = '#00ff99';
+    terminal.style.padding = '0 0 0 0';
+    terminal.style.minHeight = '320px';
+    terminal.style.maxWidth = '600px';
+    terminal.style.width = '100%';
+    terminal.style.border = '2.5px solid #00ff99';
+    terminal.style.position = 'relative';
+    terminal.style.display = 'flex';
+    terminal.style.flexDirection = 'column';
+    terminal.style.justifyContent = 'flex-start';
+    terminal.style.alignItems = 'stretch';
+    // Substitui o painel matrix pelo terminal
+    matrixPanel.parentNode.replaceChild(terminal, matrixPanel);
+  }
+  terminal.innerHTML = '';
+  // Header CODE MATRIX
+  const header = document.createElement('div');
+  header.className = 'cmd-header-success';
+  header.style.background = '#00ff99';
+  header.style.color = '#0b2e1a';
+  header.style.fontWeight = 'bold';
+  header.style.padding = '18px 32px 10px 32px';
+  header.style.fontSize = '1.1em';
+  header.style.letterSpacing = '0.1em';
+  header.style.textTransform = 'uppercase';
+  header.style.borderBottom = '2.5px solid #00ff99';
+  header.style.borderRadius = '0';
+  header.style.fontFamily = "'ChakraPetch', monospace";
+  header.style.margin = '0 0 0 0';
+  terminal.appendChild(header);
+  header.textContent = 'CODE MATRIX';
+
+  // Terminal lines
+  const lines = [
+    '//ROOT',
+    '//ACCESS_REQUEST',
+    '//ACCESS_REQUEST_SUCCESS',
+    '//COLLECTING PACKET_1 ............................ COMPLETE',
+    '//COLLECTING PACKET_2 ............................ COMPLETE',
+    '//COLLECTING PACKET_3 ............................ COMPLETE',
+    '//COLLECTING PACKET_4 ............................ COMPLETE',
+    '//LOGIN',
+    '//LOGIN_SUCCESS',
+    '//',
+    '//UPLOAD_IN_PROGRESS',
+    '//UPLOAD_COMPLETE!'
+  ];
+
+  let i = 0;
+  function typeLine() {
+    if (i < lines.length) {
+      const line = document.createElement('div');
+      line.textContent = lines[i];
+      line.style.color = '#00ff99';
+      line.style.fontFamily = "'ChakraPetch', monospace";
+      line.style.fontSize = '1.15em';
+      line.style.padding = '0 32px';
+      terminal.appendChild(line);
+      i++;
+      setTimeout(typeLine, 180);
+    } else {
+      // Adiciona o footer verde claro com o texto centralizado e o bônus total
+      let footer = document.createElement('div');
+      footer.style.background = '#00ff99';
+      footer.style.color = '#0b2e1a';
+      footer.style.fontFamily = "'ChakraPetch', monospace";
+      footer.style.fontWeight = 'bold';
+      footer.style.fontSize = '1.35em';
+      footer.style.letterSpacing = '0.08em';
+      footer.style.textAlign = 'center';
+      footer.style.padding = '32px 0 28px 0';
+      footer.style.margin = '0';
+      footer.style.width = '100%';
+      footer.textContent = `ALL DAEMONS UPLOADED (BONUS +${totalBonus})`;
+      footer.style.position = 'relative';
+      footer.style.bottom = '0';
+      footer.style.left = '0';
+      footer.style.borderTop = '2.5px solid #00ff99';
+      terminal.appendChild(footer);
+
+      // Botão EXIT INTERFACE abaixo do terminal
+      if (!exitBtn) {
+        exitBtn = document.createElement('button');
+        exitBtn.className = 'exit-btn-success';
+        exitBtn.setAttribute('data-augmented-ui', 'br-clip border');
+        exitBtn.textContent = 'EXIT INTERFACE';
+        exitBtn.onclick = () => location.reload();
+        document.body.appendChild(exitBtn);
+      }
+    }
+  }
+  typeLine();
+}
+
+function showFailedFeedback() {
+  document.querySelectorAll('.bp-hack-item').forEach((el) => {
+    el.classList.add('failed-seq');
+  });
+  $('failMsg').classList.remove('hide');
+
+  // Adiciona o botão de EXIT vermelho
+  let exitBtn = document.querySelector('.exit-btn-fail');
+  if (!exitBtn) {
+    exitBtn = document.createElement('button');
+    exitBtn.className = 'exit-btn-fail';
+    exitBtn.setAttribute('data-augmented-ui', 'br-clip border');
+    exitBtn.textContent = 'EXIT INTERFACE';
+    exitBtn.onclick = () => location.reload();
+    document.body.appendChild(exitBtn);
+  }
+}
+
+function hideHandsfree(){
+  if(window.handsfree){ handsfree.stop(); }
+  const foot=document.getElementById('handsfree-footer');
+  if(foot) foot.style.display='none';
+}
+</script>
+<!-- Handsfree.js – Hand-tracking cursor integration -->
+<script src="https://unpkg.com/handsfree@8.5.1/build/lib/handsfree.js"></script>
+<script>
+  window.addEventListener('DOMContentLoaded', () => {
+     // showDebug: true agora irá mostrar a câmera e os pontos de referência
+     const handsfree = new Handsfree({
+        showDebug: true,
+        useGestures: true,
+        hands: {
+          enabled: true,
+          maxNumHands: 2,      // Detecta até 2 mãos
+          selfieMode: true,    // Espelha (match ao vídeo)
+          modelType: 'lite'    // Mais rápido; pode trocar para 'full' se precisar
+        }
+      })
+     handsfree.enablePlugins('browser');
+     handsfree.start()
+ 
+     // --- Criação de Elementos da Interface ---
+ 
+     // 1. Estilos para cursor e para a nova mini-view da câmera
+     const styleEl = document.createElement('style');
+     styleEl.textContent = `
+       /* Oculta o cursor padrão do plugin "browser" para usar o nosso */
+       .handsfree-pointer { display: none !important; }
+
+       #handsfree-cursor {
+         position: fixed;
+         width: 24px;
+         height: 24px;
+         border: 2px solid #00ffff;
+         border-radius: 50%;
+         background: rgba(0, 255, 255, 0.4);
+         pointer-events: none;
+         z-index: 10000;
+         mix-blend-mode: difference;
+         display: none; /* Inicia oculto */
+       }
+       body { cursor: auto !important; }
+
+       /* Esconde o debugger padrão do Handsfree */
+       .handsfree-debugger { display: none !important; }
+
+       /* Novo mini feed no canto inferior direito */
+       #mini-feed {
+         position: relative;
+         width: 100%;
+         max-width: 333px; /* largura máx similar ao painel */
+         height: 200px;
+         border: 3px solid #eaff00;
+         border-radius: 6px;
+         background: #000;
+         overflow: visible;                /* opcional: deixa aparecer as barras */
+       }
+
+       #mini-feed video,
+       #mini-feed canvas {
+         position: absolute;
+         top: 0;
+         left: 0;
+         width: 100%;
+         height: 100%;
+         object-fit: contain !important;   /* mostra o quadro completo  */
+         object-position: center center;   /* centraliza dentro do box */
+       }
+       /* Reflete apenas o canvas (landmarks), não o vídeo */
+       #mini-feed canvas { transform: none; }
+       #mini-feed video  { transform: none; }
+       /* Ajusta qualquer saída Handsfree para no máximo 200px de altura */
+       .handsfree-debugger,
+       .handsfree-debugger video,
+       .handsfree-debugger canvas {
+         max-height: 200px !important;
+         height: 100% !important;
+         width: auto !important;
+       }
+       /* Ajusta o wrapper original (.handsfree-debugger) para ocupar todo o painel */
+       .handsfree-debugger {
+         position: absolute !important;
+         top: 0 !important;
+         left: 0 !important;
+         width: 100% !important;
+         height: 100% !important;
+         border: none !important;
+         overflow: hidden !important;
+       }
+     `;
+     document.head.appendChild(styleEl);
+ 
+     // 2. Referência ao painel de hacks
+     const hacksPanel = document.querySelector('.bp-hacks-panel');
+
+     // Referências aos elementos já existentes do footer
+     const miniFeed = document.getElementById('mini-feed');
+     const miniCanvas = document.getElementById('mini-canvas');
+     const footer = document.getElementById('handsfree-footer');
+
+     // 3. Cria e anexa o elemento do cursor
+     const cursorEl = document.createElement('div');
+     cursorEl.id = 'handsfree-cursor';
+     document.body.appendChild(cursorEl);
+ 
+     // 4. Cria o Mini-Feed da webcam
+     // Quando o Handsfree iniciar e criar o <video>, movemos para o mini-feed
+     handsfree.on('ready', () => {
+       const vid = handsfree.debug?.$video || document.querySelector('.handsfree-video');
+       if (vid && !miniFeed.contains(vid)) {
+         // Remove atributos width/height fixos para permitir responsividade
+         vid.removeAttribute('width');
+         vid.removeAttribute('height');
+         vid.style.display = 'block';
+         vid.style.visibility='visible';
+         vid.style.position = 'absolute';
+         vid.style.top = '0';
+         vid.style.left = '0';
+         vid.style.width = '100%';
+         vid.style.height = '100%';
+         vid.style.objectFit = 'contain';
+         miniFeed.insertBefore(vid, miniCanvas);
+       }
+     });
+ 
+     // 5. Botão para Habilitar/Desabilitar Handsfree
+     const toggleBtn = document.querySelector('#handsfree-footer .toggle-container');
+
+     // adiciona footer após bp-mainarea
+     const mainarea = document.querySelector('.bp-mainarea');
+     mainarea.insertAdjacentElement('afterend', footer);
+ 
+     let isHandsfreeEnabled = true;
+     toggleBtn.addEventListener('click', () => {
+       isHandsfreeEnabled = !isHandsfreeEnabled;
+       toggleBtn.classList.toggle('active');
+       const textEl = toggleBtn.querySelector('.toggle-text');
+ 
+       if (isHandsfreeEnabled) {
+         handsfree.unpause();
+         textEl.textContent = 'Handsfree ON';
+       } else {
+         handsfree.pause();
+         textEl.textContent = 'Handsfree OFF';
+         document.getElementById('handsfree-cursor').style.display = 'none';
+       }
+     });
+ 
+     // --- LÓGICA DE CONTROLE UNIFICADA E FINAL ---
+ 
+     // Variáveis de estado
+     let lastHoveredElement = null;
+     let pinchCooldown = false;
+     let gridRect = null;
+     let cellWidth = 0;
+     let cellHeight = 0;
+     let lastCursorPos = { x: 0, y: 0 };
+    const smoothingFactor = 0.3;
+
+    // --- Utilitário clamp ---
+    function clamp(v, min = 0, max = 1) {
+      return Math.max(min, Math.min(max, v));
+    }
+
+    // --- ROI para mapeamento da câmera ao Code Matrix (ajustado) ---
+    // Ajuste conforme posicionamento da matriz na tela
+    const ROI = { xMin: 0.55, xMax: 0.79, yMin: 0.40, yMax: 0.72 };
+
+
+
+      // Variáveis para clique sustentado
+      let pinchStartTime = null; // timestamp quando começou a pinça
+
+      function setCursorProgress(p){
+        // p: 0-1. Increase size and brightness for clearer feedback
+        const opacity = 0.2 + 0.8*p; // 0.2 to 1
+        cursorEl.style.background = `rgba(0,255,255,${opacity})`;
+        cursorEl.style.transform = 'translate(-50%,-50%)';
+      }
+
+      // === Função para desenhar landmarks de múltiplas mãos ===
+      function drawLandmarksMulti(allLandmarks) {
+        const ctx = miniCanvas.getContext('2d');
+        const {width, height} = miniCanvas;
+        ctx.clearRect(0,0,width,height);
+        if (!allLandmarks || allLandmarks.length === 0) return;
+        ctx.fillStyle = '#00ffff';
+        allLandmarks.forEach(lms=>{
+          if (!lms) return;
+          lms.forEach(pt=>{
+            const x = pt.x * width;
+            const y = pt.y * height;
+            ctx.beginPath();
+            ctx.arc(x, y, 3, 0, Math.PI*2);
+            ctx.fill();
+          });
+        });
+      }
+
+      // Utilitário para verificar se o cursor está dentro da área da matriz
+      function isInsideMatrix(x, y) {
+        if (!gridRect) return false;
+        return x >= gridRect.left && x <= gridRect.right && y >= gridRect.top && y <= gridRect.bottom;
+      }
+ 
+     setTimeout(() => {
+         const gridEl = document.getElementById('grid');
+         if (gridEl) {
+             gridRect = gridEl.getBoundingClientRect();
+             if (gridEl.rows.length > 0 && gridEl.rows[0].cells.length > 0) {
+                 const cellRect = gridEl.rows[0].cells[0].getBoundingClientRect();
+                 cellWidth = cellRect.width;
+                 cellHeight = cellRect.height;
+             }
+         }
+     }, 500);
+
+    handsfree.use('minimalController', ({ hands }) => {
+      const cursorEl = document.getElementById('handsfree-cursor');
+
+      // Se nenhuma mão for detectada, esconde o cursor e sai.
+      if (!hands.landmarks || hands.landmarks.length === 0) {
+        cursorEl.style.display = 'none';
+        return;
+      }
+
+      // --- LÓGICA DE SELEÇÃO DE MÃO (Lida com Múltiplas Mãos) ---
+      let handToUse = null;
+      let handLabel = 'Detectando...';
+
+      // Procura pela mão direita primeiro
+      for (let i = 0; i < hands.landmarks.length; i++) {
+        if (hands.handedness?.[i]?.label === 'Right') {
+          handToUse = hands.landmarks[i];
+          handLabel = 'Mão Direita';
+          break;
+        }
+      }
+
+      // Se não encontrou a direita, usa a primeira mão disponível
+      if (!handToUse) {
+        handToUse = hands.landmarks[0];
+        handLabel = hands.handedness?.[0]?.label === 'Left' ? 'Mão Esquerda' : 'Detectando...';
+      }
+      
+      // --- LÓGICA DO CURSOR (Usa a mão selecionada em "handToUse") ---
+
+      if (!handToUse[0] || !handToUse[5] || !handToUse[9] || !handToUse[17]) {
+        drawLandmarks(null);
+        return;
+      }
+
+      // Desenha landmarks de todas as mãos detectadas
+      drawLandmarksMulti(hands.landmarks);
+
+      // 1. Calcula o centro da palma
+      const p0 = handToUse[0], p5 = handToUse[5], p9 = handToUse[9], p17 = handToUse[17];
+      const palmCenterX = (p0.x + p5.x + p9.x + p17.x) / 4;
+      const palmCenterY = (p0.y + p5.y + p9.y + p17.y) / 4;
+
+      // 2. Mapeia posição da palma dentro da janela ROI e normaliza (0-1)
+      let normX = (palmCenterX - ROI.xMin) / (ROI.xMax - ROI.xMin);
+      normX = clamp(normX);
+      let normY = (palmCenterY - ROI.yMin) / (ROI.yMax - ROI.yMin);
+      normY = clamp(normY);
+
+      // Converte para coordenadas dentro do Code Matrix
+      const targetX = gridRect.left + normX * gridRect.width;
+      const targetY = gridRect.top  + normY * gridRect.height;
+
+      // 3. Suavização e posicionamento do cursor
+      const smoothedX = lastCursorPos.x * (1 - smoothingFactor) + targetX * smoothingFactor;
+      const smoothedY = lastCursorPos.y * (1 - smoothingFactor) + targetY * smoothingFactor;
+      lastCursorPos = { x: smoothedX, y: smoothedY };
+
+      cursorEl.style.left = `${smoothedX}px`;
+      cursorEl.style.top = `${smoothedY}px`;
+      cursorEl.style.display = 'block';
+
+      // 4. Lógica de hover
+      const isVisible = isInsideMatrix(smoothedX, smoothedY);
+      let currentElement = null;
+      if (isVisible) {
+        const relativeX = smoothedX - gridRect.left;
+        const relativeY = smoothedY - gridRect.top;
+        const col = Math.floor(relativeX / cellWidth);
+        const row = Math.floor(relativeY / cellHeight);
+        const gridEl = document.getElementById('grid');
+        if (gridEl.rows[row] && gridEl.rows[row].cells[col]) {
+          currentElement = gridEl.rows[row].cells[col];
+        }
+      }
+      if (lastHoveredElement && lastHoveredElement !== currentElement) {
+        lastHoveredElement.dispatchEvent(new MouseEvent('mouseleave', { bubbles: true }));
+      }
+      if (currentElement && currentElement !== lastHoveredElement) {
+        currentElement.dispatchEvent(new MouseEvent('mouseenter', { bubbles: true }));
+      }
+      lastHoveredElement = currentElement;
+
+      // 5. Lógica de clique sustentado de 1s
+      const pinchState = hands.pinchState?.[0]?.[0]; // estado da pinça dedo indicador
+
+      if (pinchState === 'start') {
+        pinchStartTime = Date.now();
+        setCursorProgress(0);
+      }
+
+      if ((pinchState === 'held' || pinchState === 'start') && pinchStartTime) {
+        const elapsed = Date.now() - pinchStartTime;
+        const progress = Math.min(elapsed / 300, 1);
+        setCursorProgress(progress);
+        if (progress === 1 && !pinchCooldown && currentElement) {
+          onPick(currentElement);
+          pinchCooldown = true;
+          setTimeout(() => { pinchCooldown = false; }, 750);
+          pinchStartTime = null;
+          setCursorProgress(0);
+        }
+      }
+
+      if (pinchState === 'released' || pinchState === undefined) {
+        pinchStartTime = null;
+        setCursorProgress(0);
+      }
+    });
+ 
+     // Desativa plugins de scroll (se existirem)
+     if(handsfree.plugin.pinchScroll) handsfree.plugin.pinchScroll.disable();
+ 
+     // Desativa plugins de scroll (se existirem, o que não deve acontecer)
+    handsfree.on('deviceError', err => {
+      alert('Não foi possível acessar a câmera. Verifique permissões de site e conexão HTTPS.')
+      console.error(err)
+    })
+  })
+</script>
+</body>
+</html>
