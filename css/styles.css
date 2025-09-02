@@ -31,7 +31,6 @@ h1, h2, h3 {
   width: 100%;
   height: 100vh;
   position: relative;
-  margin: 0 auto;
 }
 
 #inicio {
@@ -144,52 +143,10 @@ h1, h2, h3, label, .turno-info {
   box-shadow: 0 0 8px #00fff7;
   text-align: center;
 }
-#dado, #dadoHacker, #nivelInput, #bonusInput {
-  width: 50px;
-  min-width: 50px;
-  max-width: 50px;
-  margin-bottom: 24px;
-  background: transparent;
-  color: #00fff7;
-  border: 2px solid #00fff7;
-  border-radius: 0;
-  font-family: 'Rajdhani Medium', 'Rajdhani', Arial, sans-serif !important;
-  font-size: 1.2em;
-  box-shadow: 0 0 8px #00fff7;
-  text-align: center;
-}
-#dado, #dadoHacker, #nivelInput, #bonusInput, #bonusD20Input, #bonusHackerInput {
-  width: 50px;
-  min-width: 50px;
-  max-width: 50px;
-  margin-bottom: 24px;
-  background: transparent;
-  color: #00fff7;
-  border: 2px solid #00fff7;
-  border-radius: 0;
-  font-family: 'Rajdhani Medium', 'Rajdhani', Arial, sans-serif !important;
-  font-size: 1.2em;
-  box-shadow: 0 0 8px #00fff7;
-  text-align: center;
-}
 #dado:focus, #dadoHacker:focus {
   outline: 2px solid #ff003c;
 }
-#dado:focus, #dadoHacker:focus, #nivelInput:focus, #bonusInput:focus {
-  outline: 2px solid #ff003c;
-}
-#dado:focus, #dadoHacker:focus, #nivelInput:focus, #bonusInput:focus, #bonusD20Input:focus, #bonusHackerInput:focus {
-  outline: 2px solid #ff003c;
-}
 #dado option, #dadoHacker option {
-  background: #000;
-  color: #00fff7;
-}
-#dado option, #dadoHacker option, #nivelInput option, #bonusInput option {
-  background: #000;
-  color: #00fff7;
-}
-#dado option, #dadoHacker option, #nivelInput option, #bonusInput option, #bonusD20Input option, #bonusHackerInput option {
   background: #000;
   color: #00fff7;
 }
@@ -198,14 +155,8 @@ h1, h2, h3, label, .turno-info {
   color: #00fff7;
   font-size: 1.2em;
   margin-bottom: 2px;
-  /* margin-top removed to keep rows aligned */
+  margin-top: 8px;
   font-family: 'Rajdhani Medium', 'Rajdhani', Arial, sans-serif !important;
-}
-
-/* Ensure no extra top margin on the D12 label inside combat controls */
-.combat-controls label[for="dadoHacker"],
-.combat-controls #dadoHacker + label {
-  margin-top: 0;
 }
 
 .combat-layout {
@@ -239,10 +190,10 @@ h1, h2, h3, label, .turno-info {
 
 .ia-container {
   position: absolute;
-  bottom: 30px;
-  right: 10px;
-  width: 350px;
-  height: 350px;
+  bottom: 80px;
+  right: 0;
+  width: 400px;
+  height: 400px;
   margin: 0;
 }
 
@@ -314,14 +265,14 @@ h1, h2, h3, label, .turno-info {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  object-position: center center; /* sem offset */
+  object-position: 0% -30%;
   filter: grayscale(1) brightness(1.2) contrast(1.2);
-  transform: none; /* sem zoom */
+  transform: scale(3.2);
 }
 .status-card.ia .hud-foto img {
   width: 100%;
   height: 100%;
-  object-fit: contain; /* preservar ícone sem cortar */
+  object-fit: cover;
   object-position: center center;
   filter: none;
   transform: none;
@@ -385,81 +336,23 @@ h1, h2, h3, label, .turno-info {
 }
 
 .player-character {
-  position: relative;
-  height: 350px;
-  z-index: 1;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  height: 500px;
+  z-index: 0;
   pointer-events: none;
 }
 
-.player-controls {
-  position: absolute;
-  bottom: 20px;
-  left: 0;
-  display: flex;
-  align-items: flex-end;
-  gap: 32px;
-  z-index: 2;
-}
 .combat-controls {
-  position: relative;
+  position: absolute;
+  bottom: 120px;
+  left: 270px;
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
-  gap: 10px;
-  z-index: 2;
-}
-
-.combat-controls .control-row {
-  display: flex;
-  align-items: flex-start;
-  gap: 14px;
-  flex-wrap: nowrap;
-}
-
-.combat-controls .control-col {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 4px;
-  flex: 0 0 auto;
-}
-/* Normalize label spacing inside columns */
-.combat-controls .control-col label {
-  margin: 0 0 2px 0;
-  display: block;
-  line-height: 1.1;
-}
-
-/* Garantir mesmo espaçamento entre a 1ª e 2ª coluna em todas as linhas */
-.combat-controls .control-row > .control-col + .control-col {
-  margin-left: 24px;
-}
-
-/* Afastar horizontalmente D20 de Nivel */
-.combat-controls .nivel-col {
-  margin-left: 24px;
-}
-
-.combat-controls .bonus-col-d20 {
-  margin-left: 24px;
-}
-
-.combat-controls input[type="text"] {
-  width: 120px;
-  min-width: 120px;
-  max-width: 160px;
-  background: transparent;
-  color: #00fff7;
-  border: 2px solid #00fff7;
-  border-radius: 0;
-  font-family: 'Rajdhani Medium', 'Rajdhani', Arial, sans-serif !important;
-  font-size: 1.1em;
-  padding: 4px 8px;
-  box-shadow: 0 0 8px #00fff7;
-}
-
-.combat-controls input[type="text"]::placeholder {
-  color: #00fff7aa;
+  align-items: center;
+  gap: 20px;
+  z-index: 5;
 }
 
 .combat-controls label {
@@ -640,24 +533,24 @@ html, body {
 }
 
 .dice-animation {
-    position: absolute;
-    bottom: 10px;
-    right: 30px;
-    background: rgba(0,0,0,0.85);
-    border: 2px solid #ff0000;
-    border-radius: 12px;
-    padding: clamp(6px, 1.8vh, 18px) clamp(10px, 2.8vh, 32px);
-    font-size: clamp(1rem, 2.2vh, 2rem);
-    color: #ff0000;
-    box-shadow: 0 0 16px #ff000044;
-    z-index: 10;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    min-width: clamp(48px, 8vh, 80px);
-    min-height: clamp(36px, 6vh, 60px);
-    text-shadow: 0 0 8px #ff0000;
-    animation: dice-pop 0.3s;
+  position: absolute;
+  bottom: 10px;
+  right: 30px;
+  background: rgba(0,0,0,0.85);
+  border: 2px solid #ff0000;
+  border-radius: 12px;
+  padding: 18px 32px;
+  font-size: 2.2rem;
+  color: #ff0000;
+  box-shadow: 0 0 16px #ff000044;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 80px;
+  min-height: 60px;
+  text-shadow: 0 0 8px #ff0000;
+  animation: dice-pop 0.3s;
 }
 
 @keyframes dice-pop {
@@ -673,19 +566,16 @@ html, body {
 .character-selection {
   display: flex;
   flex-direction: row;
-  justify-content: space-between;
+  justify-content: center;
   align-items: flex-start;
-  gap: 24px; /* margem entre cards */
-  padding: 0 24px; /* margem em relação às bordas da tela */
+  gap: 40px;
   margin-top: 32px;
-  box-sizing: border-box;
-  width: 100%;
 }
 .character-selection .character-option {
-  flex: 0 0 calc((100% - 48px) / 3); /* três colunas exatas considerando gap */
-  max-width: calc((100% - 48px) / 3);
+  width: 100%;
+  max-width: 38vw;
   max-height: 72vh;
-  margin: 0;
+  margin: 0 1vw;
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
@@ -694,7 +584,7 @@ html, body {
   background: rgba(0,0,0,0.2);
   border: 2px solid #00fff7;
   border-radius: 12px;
-  padding: 16px 18px 14px 18px;
+  padding: 18px 24px 16px 24px;
   box-shadow: 0 0 12px #00fff744;
   transition: border 0.2s, box-shadow 0.2s;
 }
@@ -749,196 +639,123 @@ html, body {
   display: block;
   max-width: 90vw;
   white-space: pre;
+}
+
+/* --- PAINEL DE DADOS DO JOGADOR --- */
+.dice-panel {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  position: relative;
+}
+
+.dice-container {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  order: 1;
+}
+
+.dice-container:nth-child(2) {
+  order: 2;
+}
+
+#playerDiceAnimation {
+  border-color: #00fff7;
+  color: #00fff7;
+  text-shadow: 0 0 8px #00fff7, 0 0 2px #ff003c;
+  box-shadow: 0 0 16px #00fff744, 0 0 4px #ff003c;
+  position: relative;
+  z-index: 2;
+  min-width: 48px;
+  min-height: 36px;
+  font-size: 1.8rem;
+  font-weight: bold;
+}
+
+#playerDiceAnimationHacker {
+  border-color: #00fff7;
+  color: #00fff7;
+  text-shadow: 0 0 8px #00fff7, 0 0 2px #ff003c;
+  box-shadow: 0 0 16px #00fff744, 0 0 4px #ff003c;
+  position: relative;
+  z-index: 2;
+  min-width: 48px;
+  min-height: 36px;
+  font-size: 1.8rem;
+  font-weight: bold;
+}
+
+.dice-label {
+  color: #00fff7;
+  font-family: 'Rajdhani Medium', 'Rajdhani', Arial, sans-serif;
+  font-size: 1.2em;
+  font-weight: bold;
+  text-shadow: 0 0 8px #00fff7, 0 0 2px #ff003c;
+  letter-spacing: 1px;
+}
+
+#attackBtn {
+  order: 3;
+  position: relative;
+  z-index: 1;
+  margin-top: 10px;
+}
+
+.attack-btn {
+  background: #00fff7;
+  color: #000;
+  border: 2px solid #00fff7;
+  border-radius: 0;
+  font-family: 'Rajdhani Medium', 'Rajdhani', Arial, sans-serif !important;
+  font-size: 1.4em;
+  font-weight: bold;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  box-shadow: 0 0 20px #00fff7, 0 0 6px #ff003c;
+  padding: 10px 25px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  outline: none;
+  min-width: 125px;
+  position: relative;
+  overflow: hidden;
+  z-index: 1;
+}
+
+.attack-btn:hover {
+  background: #ff003c;
+  color: #fff;
+  border-color: #ff003c;
+  box-shadow: 0 0 24px #ff003c, 0 0 8px #00fff7;
+  transform: scale(1.05);
+}
+
+.attack-btn:active {
+  transform: scale(0.95);
+}
+
+.attack-btn::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+  transform: rotate(45deg);
+  animation: shine 3s infinite;
+}
+
+@keyframes shine {
+  0% {
+    transform: translateX(-100%) translateY(-100%) rotate(45deg);
+  }
+  50% {
+    transform: translateX(100%) translateY(100%) rotate(45deg);
+  }
+  100% {
+    transform: translateX(-100%) translateY(-100%) rotate(45deg);
+  }
 } 
-
-/* --- RESPONSIVE: Mobile landscape adjustments --- */
-@media (orientation: landscape) and (max-width: 900px) {
-  body {
-    padding: 12px;
-  }
-  /* Tela inicial - logo 30% menor e mais para cima */
-  #inicio img[alt="Logo"] {
-    max-width: 42vw; /* 30% menor que 60vw */
-    margin-top: 16px; /* mais para cima */
-    max-height: 50vh;
-  }
-
-  /* Seleção de personagens - reduzir cards e fontes, permitir personagens maiores */
-  .character-selection {
-    flex-wrap: nowrap; /* manter sempre 3 lado a lado */
-    gap: 12px;
-    padding: 0 12px;
-    box-sizing: border-box;
-    justify-content: space-between;
-  }
-  .character-selection .character-option {
-    flex: 0 0 calc((100% - 24px) / 3);
-    max-width: calc((100% - 24px) / 3);
-    padding: 12px 14px 12px 14px;
-  }
-  .character-selection .character-nome { font-size: 0.95em; }
-  .character-selection .character-habilidade { font-size: 0.8em; }
-  .character-selection .character-img {
-    width: 100%;
-    height: auto;
-    max-height: 60vh;
-    margin-top: 10px;
-  }
-  .turno-info {
-    font-size: 0.95em;
-    padding: 6px 8px;
-  }
-  .status-card {
-    min-width: 210px;
-    max-width: 240px;
-    height: 66px;
-    gap: 12px;
-  }
-  .status-card .hud-foto {
-    width: 44px;
-    height: 44px;
-    margin-left: 12px;
-  }
-  .status-card .hud-foto img {
-    object-fit: contain;
-  }
-  .status-card .hud-nome {
-    font-size: 0.85em;
-    margin-bottom: 0;
-  }
-  .status-card .barra-vida {
-    width: 80%;
-    height: 10px;
-    margin-bottom: 0;
-  }
-  .status-card .hud-valor {
-    font-size: 0.9em;
-  }
-  .ia-container {
-    width: 220px;
-    height: 220px;
-    bottom: 44px;
-  }
-  .player-character { height: 350px; }
-  .ia-container { width: 350px; height: 350px; }
-  .combat-controls {
-    bottom: 28px;
-    left: 25%;
-    transform: translateX(-50%);
-    gap: 8px;
-  }
-  .combat-controls .control-row {
-    gap: 10px;
-  }
-  .combat-controls label { font-size: 0.95em; }
-  #dado, #dadoHacker, #nivelInput, #bonusInput {
-    width: 40px;
-    min-width: 40px;
-    max-width: 40px;
-    font-size: 0.95em;
-    margin-bottom: 14px;
-  }
-  button, #confirmarDadoBtn, .reiniciar-btn, #sortearRecompensaBtn {
-    font-size: 0.9em;
-    padding: 6px 16px; /* ~menores */
-  }
-  .reiniciar-btn {
-    right: 20px !important;
-    bottom: 20px !important;
-  }
-
-  /* Tela final - evitar vazamento lateral */
-  #resultado { max-width: 96vw; margin: 0 auto; }
-  #recompensa { max-width: 96vw; }
-}
-
-@media (orientation: landscape) and (max-width: 640px) {
-  /* Tela inicial */
-  #inicio img[alt="Logo"] { max-width: 48vw; margin-top: 32px; }
-
-  /* Seleção de personagens - duas colunas */
-  .character-selection .character-option { width: calc(50% - 12px); }
-  .character-selection .character-nome { font-size: 0.95em; }
-  .character-selection .character-habilidade { font-size: 0.85em; }
-  .character-selection { gap: 12px; padding: 0 10px; }
-
-  .status-card {
-    min-width: 200px;
-    max-width: 220px;
-    height: 64px;
-  }
-  .status-card .hud-foto {
-    width: 42px;
-    height: 42px;
-  }
-  .ia-container {
-    width: 200px;
-    height: 200px;
-    bottom: 40px;
-  }
-  .player-character {
-    height: 240px;
-  }
-  #dado, #dadoHacker, #nivelInput, #bonusInput {
-    width: 40px;
-    min-width: 40px;
-    max-width: 40px;
-    font-size: 0.95em;
-  }
-  button, #confirmarDadoBtn, .reiniciar-btn, #sortearRecompensaBtn {
-    font-size: 0.84em; /* ~30% menor vs 1.2em base */
-    padding: 6px 16px;
-  }
-  /* HUD menor */
-  .status-card { height: 58px; }
-  .status-card .hud-foto { width: 38px; height: 38px; }
-
-  /* Tela final - evitar vazamento */
-  #resultado { max-width: 98vw; }
-  #recompensa { max-width: 98vw; }
-}
-
-/* Fallback responsivo também para dispositivos em outras orientações */
-@media (max-width: 900px) {
-  /* Tela inicial - logo menor e mais acima (override do inline) */
-  #inicio img[alt="Logo"] {
-    max-width: 42vw !important;
-    max-height: 50vh !important;
-    margin-top: 16px !important;
-  }
-  /* Combate - diminuir UI/botões */
-  .combat-controls label { font-size: 0.95em; }
-  #dado, #dadoHacker, #nivelInput, #bonusInput {
-    width: 40px; min-width: 40px; max-width: 40px; font-size: 0.95em; margin-bottom: 14px;
-  }
-  button, #confirmarDadoBtn, .reiniciar-btn, #sortearRecompensaBtn {
-    font-size: 0.9em; padding: 6px 16px;
-  }
-  .status-card { height: 66px; min-width: 210px; max-width: 240px; }
-  .status-card .hud-foto { width: 44px; height: 44px; }
-  .status-card .hud-nome { font-size: 0.85em; }
-  .status-card .hud-valor { font-size: 0.9em; }
-}
-
-@media (max-width: 640px) {
-  /* Tela inicial - logo um pouco menor */
-  #inicio img[alt="Logo"] {
-    max-width: 48vw !important;
-    margin-top: 12px !important;
-  }
-  /* Seleção - texto menor para caber melhor nas laterais */
-  .character-selection .character-nome { font-size: 0.9em; }
-  .character-selection .character-habilidade { font-size: 0.8em; }
-  .character-selection { gap: 12px; padding: 0 10px; }
-  .character-selection .character-option { width: calc(50% - 12px); }
-  /* Combate - UI ainda menor */
-  .combat-controls label { font-size: 0.9em; }
-  #dado, #dadoHacker, #nivelInput, #bonusInput {
-    width: 36px; min-width: 36px; max-width: 36px; font-size: 0.9em; margin-bottom: 12px;
-  }
-  button, #confirmarDadoBtn, .reiniciar-btn, #sortearRecompensaBtn {
-    font-size: 0.84em; padding: 6px 12px;
-  }
-  .status-card { height: 58px; min-width: 200px; max-width: 220px; }
-  .status-card .hud-foto { width: 38px; height: 38px; }
-}

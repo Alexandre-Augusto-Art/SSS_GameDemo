@@ -13,9 +13,7 @@ class Game {
 
     setupEventListeners() {
         document.getElementById('iniciarBtn')?.addEventListener('click', () => this.irParaEscolha());
-        document.getElementById('confirmarDadoBtn')?.addEventListener('click', () => this.processarAtaqueJogador());
-        document.getElementById('continuarTurnoBtn')?.addEventListener('click', () => this.finalizarTurno());
-        document.getElementById('sortearRecompensaBtn')?.addEventListener('click', () => this.sortearRecompensa());
+        document.getElementById('attackBtn')?.addEventListener('click', () => this.processarAtaqueJogador());
         document.getElementById('reiniciarBtn')?.addEventListener('click', () => this.reiniciarJogo());
     }
 
@@ -34,28 +32,19 @@ class Game {
         const playerCharacter = document.getElementById("playerCharacter");
         playerCharacter.src = imagemSrc;
         
-        
         // Atualiza HUD de vida do jogador
         const nomeJogador = document.getElementById("nomeJogador");
         const fotoJogador = document.getElementById("fotoJogador");
         if (nomeJogador) nomeJogador.textContent = p;
-        if (fotoJogador) {
-            const hudImgSrc = `Imgs/Player/HUD/${p}.png`;
-            fotoJogador.src = hudImgSrc;
-            // Remover quaisquer ajustes manuais anteriores
-            fotoJogador.style.objectPosition = "";
-            fotoJogador.style.transform = "";
+        if (fotoJogador) fotoJogador.src = imagemSrc;
+        
+        // Mostrar ou esconder a caixa D12 baseado no personagem
+        const hackerDiceContainer = document.querySelector('.hacker-only');
+        if (hackerDiceContainer) {
+            hackerDiceContainer.style.display = p === "Hacker" ? "flex" : "none";
         }
         
-        // Mostrar ou esconder o slot do dado extra
-        const dadoHackerCol = document.getElementById("dadoHackerCol");
-        if (dadoHackerCol) {
-            if (p === "AAA-404") {
-                dadoHackerCol.style.display = "flex"; // mostra D12 acima
-            } else {
-                dadoHackerCol.style.display = "none";
-            }
-        }
+
         
         this.atualizarBarrasVida();
     }
@@ -72,10 +61,30 @@ class Game {
     }
 
     processarAtaqueJogador() {
-        let dado = parseInt(document.getElementById("dado").value);
-        let nivelBonus = parseInt(document.getElementById("nivelInput")?.value || '0');
-        let bonusD20 = parseInt(document.getElementById("bonusInput")?.value || '0');
-        let ataqueTotal = dado + (isNaN(nivelBonus) ? 0 : nivelBonus) + (isNaN(bonusD20) ? 0 : bonusD20);
+        // Desabilita o botão durante o ataque
+        const attackBtn = document.getElementById('attackBtn');
+        if (attackBtn) attackBtn.disabled = true;
+        
+        if (this.personagem === "Hacker") {
+            // Lógica especial para o Hacker: duas animações sequenciais
+            this.animarDadosJogador(() => {
+                // Após D20, anima o D12
+                this.animarDadosHacker(() => {
+                    this.processarResultadoHacker();
+                });
+            });
+        } else {
+            // Para outros personagens: animação normal
+            this.animarDadosJogador(() => {
+                this.processarResultadoNormal();
+            });
+        }
+    }
+
+    processarResultadoNormal() {
+        // Pega o resultado do D20 que foi mostrado na caixa
+        let dado = parseInt(document.getElementById('playerDiceAnimation').textContent);
+        let ataqueTotal = dado;
         let mensagemCentral = '';
         let tipoMensagem = '';
         let acertou = false;
@@ -84,39 +93,60 @@ class Game {
         // Verifica acerto crítico
         if (dado === 20) {
             dano = 2;
-            mensagemCentral = `ACERTO CRÍTICO! (D20: ${dado} + Nivel: ${nivelBonus} + Bonus: ${isNaN(bonusD20)?0:bonusD20} = ${ataqueTotal})`;
+            mensagemCentral = `ACERTO CRÍTICO! (D20: ${dado})`;
             acertou = true;
-        } else if (this.personagem === "DeadScope") {
-            ataqueTotal = dado + 3 + (isNaN(nivelBonus) ? 0 : nivelBonus) + (isNaN(bonusD20) ? 0 : bonusD20);
+        } else if (this.personagem === "Sniper") {
+            ataqueTotal = dado + 3;
             if (ataqueTotal >= 11) acertou = true;
-            mensagemCentral = acertou ? `DeadScope acertou! (D20: ${dado} + 3 + Nivel: ${nivelBonus} + Bonus: ${isNaN(bonusD20)?0:bonusD20} = ${ataqueTotal})` : `DeadScope errou. (D20: ${dado} + 3 + Nivel: ${nivelBonus} + Bonus: ${isNaN(bonusD20)?0:bonusD20} = ${ataqueTotal})`;
-        } else if (this.personagem === "AAA-404") {
-            let dadoHacker = parseInt(document.getElementById("dadoHacker").value);
-            ataqueTotal = dado + dadoHacker + (isNaN(nivelBonus) ? 0 : nivelBonus) + (isNaN(bonusD20) ? 0 : bonusD20);
-            if (ataqueTotal >= 24) acertou = true;
-            mensagemCentral = acertou ? `AAA-404 acertou! (D20: ${dado} + D12: ${dadoHacker} + Nivel: ${nivelBonus} + Bonus: ${isNaN(bonusD20)?0:bonusD20} = ${ataqueTotal})` : `AAA-404 errou. (D20: ${dado} + D12: ${dadoHacker} + Nivel: ${nivelBonus} + Bonus: ${isNaN(bonusD20)?0:bonusD20} = ${ataqueTotal})`;
-        } else if (this.personagem === "Naya") {
-            if (ataqueTotal >= 13) acertou = true;
-            mensagemCentral = acertou ? `Naya acertou! (D20: ${dado} + Nivel: ${nivelBonus} + Bonus: ${isNaN(bonusD20)?0:bonusD20} = ${ataqueTotal})` : `Naya errou. (D20: ${dado} + Nivel: ${nivelBonus} + Bonus: ${isNaN(bonusD20)?0:bonusD20} = ${ataqueTotal})`;
+            mensagemCentral = acertou ? `Sniper acertou! (D20: ${dado} + 3 = ${ataqueTotal})` : `Sniper errou. (D20: ${dado} + 3 = ${ataqueTotal})`;
+        } else if (this.personagem === "Assassina") {
+            if (dado >= 13) acertou = true;
+            mensagemCentral = acertou ? `Assassina acertou! (D20: ${dado})` : `Assassina errou. (D20: ${dado})`;
         }
 
+        this.finalizarAtaque(acertou, dano, mensagemCentral);
+    }
+
+    processarResultadoHacker() {
+        // Pega os resultados dos dados que foram mostrados nas caixas
+        let dadoD20 = parseInt(document.getElementById('playerDiceAnimation').textContent);
+        let dadoD12 = parseInt(document.getElementById('playerDiceAnimationHacker').textContent);
+        let ataqueTotal = dadoD20 + dadoD12;
+        let acertou = ataqueTotal >= 16; // Novo requisito: 16+
+        let dano = 1;
+        let mensagemCentral = '';
+
+        if (dadoD20 === 20) {
+            dano = 2;
+            mensagemCentral = `ACERTO CRÍTICO! (D20: ${dadoD20} + D12: ${dadoD12} = ${ataqueTotal})`;
+            acertou = true;
+        } else {
+            mensagemCentral = acertou ? `Hacker acertou! (D20: ${dadoD20} + D12: ${dadoD12} = ${ataqueTotal})` : `Hacker errou. (D20: ${dadoD20} + D12: ${dadoD12} = ${ataqueTotal})`;
+        }
+
+        this.finalizarAtaque(acertou, dano, mensagemCentral);
+    }
+
+    finalizarAtaque(acertou, dano, mensagemCentral) {
+        let tipoMensagem = acertou ? 'acerto' : 'erro';
+        
         if (acertou) {
             this.vidaIA -= dano;
             this.danoCausado += dano;
-            tipoMensagem = 'acerto';
             this.mostrarDanoIA();
-        } else {
-            tipoMensagem = 'erro';
         }
+        
         this.exibirMensagemCentral(mensagemCentral, tipoMensagem);
         const resultadoJogador = document.getElementById("resultadoJogador");
         if (resultadoJogador) resultadoJogador.classList.add("hidden");
         this.atualizarBarrasVida();
+        
         // Se a vida do jogador ou da IA chegou a 0, termina com delay para animação
         if (this.vidaJogador <= 0 || this.vidaIA <= 0) {
             setTimeout(() => this.encerrarJogo(), 2000);
             return;
         }
+        
         // Exibir animação de dados antes do ataque da IA
         setTimeout(() => {
             // Só deixa a IA atacar se ela ainda tiver vida
@@ -124,6 +154,14 @@ class Game {
                 this.animarDadosIA(() => this.iniciarAtaqueIA());
             }
         }, 2000);
+        
+        // Reabilita o botão após o ataque
+        setTimeout(() => {
+            const attackBtn = document.getElementById('attackBtn');
+            if (attackBtn) attackBtn.disabled = false;
+        }, 3000);
+        
+
     }
 
     animarDadosIA(callback) {
@@ -144,6 +182,46 @@ class Game {
         }, 80);
     }
 
+    animarDadosJogador(callback) {
+        const diceEl = document.getElementById('playerDiceAnimation');
+        if (!diceEl) { callback(); return; }
+        diceEl.classList.remove('hidden');
+        let interval;
+        let count = 0;
+        let lastNumber;
+        interval = setInterval(() => {
+            lastNumber = Math.ceil(Math.random() * 20);
+            diceEl.textContent = lastNumber;
+            count++;
+            if (count > 15) {
+                clearInterval(interval);
+                // Mantém o último número gerado
+                diceEl.textContent = lastNumber;
+                if (callback) callback();
+            }
+        }, 60);
+    }
+
+    animarDadosHacker(callback) {
+        const diceEl = document.getElementById('playerDiceAnimationHacker');
+        if (!diceEl) { callback(); return; }
+        diceEl.classList.remove('hidden');
+        let interval;
+        let count = 0;
+        let lastNumber;
+        interval = setInterval(() => {
+            lastNumber = Math.ceil(Math.random() * 12);
+            diceEl.textContent = lastNumber;
+            count++;
+            if (count > 12) {
+                clearInterval(interval);
+                // Mantém o último número gerado
+                diceEl.textContent = lastNumber;
+                if (callback) callback();
+            }
+        }, 70);
+    }
+
     exibirMensagemCentral(mensagem, tipo, onHide) {
         const el = document.getElementById('playerAttackMessage');
         if (!el) return;
@@ -153,8 +231,31 @@ class Game {
         if (this._timeoutMsg) clearTimeout(this._timeoutMsg);
         this._timeoutMsg = setTimeout(() => {
             el.classList.add('hidden');
+            // Limpa as caixas de dados quando a mensagem desaparece
+            this.limparCaixasDados();
             if (onHide) onHide();
         }, 2000);
+    }
+
+    limparCaixasDados() {
+        // Limpa as caixas de dados dos jogadores
+        const playerDice = document.getElementById('playerDiceAnimation');
+        const playerDiceHacker = document.getElementById('playerDiceAnimationHacker');
+        if (playerDice) {
+            playerDice.classList.add('hidden');
+            playerDice.textContent = '';
+        }
+        if (playerDiceHacker) {
+            playerDiceHacker.classList.add('hidden');
+            playerDiceHacker.textContent = '';
+        }
+        
+        // Limpa a caixa de dados da IA
+        const iaDice = document.getElementById('diceAnimation');
+        if (iaDice) {
+            iaDice.classList.add('hidden');
+            iaDice.textContent = '';
+        }
     }
 
     mostrarDanoIA() {
@@ -238,11 +339,8 @@ class Game {
         // Exibe mensagem centralizada da IA após a do jogador
         setTimeout(() => {
             this.exibirMensagemCentral(mensagemCentral, tipoMensagem, () => {
-                // Esconde o número sorteado da IA após a mensagem sumir
-                if (diceEl) {
-                    diceEl.classList.add('hidden');
-                    diceEl.textContent = '';
-                }
+                // Não esconde o número sorteado da IA imediatamente
+                // Ele será escondido no próximo turno
             });
             this.atualizarBarrasVida();
             // Verifica se o jogador ou a IA foram derrotados
@@ -253,6 +351,8 @@ class Game {
                     if (resultadoIAEl) resultadoIAEl.classList.add("hidden");
                     this.turno++;
                     document.getElementById("numeroTurno").textContent = this.turno;
+                    
+
                 }, 2000);
             }
         }, 0);
@@ -332,7 +432,7 @@ class Game {
         const nomeJogador = document.getElementById("nomeJogador");
         const fotoJogador = document.getElementById("fotoJogador");
         if (nomeJogador) nomeJogador.textContent = "Jogador";
-        if (fotoJogador) fotoJogador.src = "Imgs/Player/HUD/AAA-404.png";
+        if (fotoJogador) fotoJogador.src = "Imgs/Player/Hacker.png";
         // Limpar resultados anteriores
         document.getElementById("recompensa").classList.add("hidden");
         document.getElementById("resultadoJogador")?.classList.add("hidden");
@@ -344,9 +444,13 @@ class Game {
         document.getElementById("inicio").classList.remove("hidden");
         // Limpar imagem do personagem
         document.getElementById("playerCharacter").src = "";
-        // Esconder slot do dado extra
-        const dadoHackerContainer = document.getElementById("dadoHackerContainer");
-        if (dadoHackerContainer) dadoHackerContainer.style.display = "none";
+        
+        // Esconder o D12 do Hacker
+        const hackerDiceContainer = document.querySelector('.hacker-only');
+        if (hackerDiceContainer) {
+            hackerDiceContainer.style.display = "none";
+        }
+
     }
 }
 

@@ -19,28 +19,28 @@
             <h2>Escolha seu personagem</h2>
             <div class="character-selection">
                 <div class="character-option">
-                    <button onclick="window.gameInstance.escolher('DeadScope', 'Imgs/Player/DeadScope.png')">
+                    <button onclick="window.gameInstance.escolher('Sniper', 'Imgs/Player/Sniper.png')">
                         Selecionar
                     </button>
-                    <div class="character-nome">DeadScope</div>
+                    <div class="character-nome">Sniper</div>
                     <div class="character-habilidade">D20 +3 bônus. Acerta com 11+.</div>
-                    <img class="character-img" src="Imgs/Player/DeadScope.png" alt="DeadScope">
+                    <img class="character-img" src="Imgs/Player/Sniper.png" alt="Sniper">
                 </div>
                 <div class="character-option">
-                    <button onclick="window.gameInstance.escolher('AAA-404', 'Imgs/Player/AAA-404.png')">
+                    <button onclick="window.gameInstance.escolher('Hacker', 'Imgs/Player/Hacker.png')">
                         Selecionar
                     </button>
-                    <div class="character-nome">AAA-404</div>
-                    <div class="character-habilidade">D20 + D12. Acerta com 24+.</div>
-                    <img class="character-img" src="Imgs/Player/AAA-404.png" alt="AAA-404">
+                    <div class="character-nome">Hacker</div>
+                    <div class="character-habilidade">D20 + D12. Acerta com 16+.</div>
+                    <img class="character-img" src="Imgs/Player/Hacker.png" alt="Hacker">
                 </div>
                 <div class="character-option">
-                    <button onclick="window.gameInstance.escolher('Naya', 'Imgs/Player/Naya.png')">
+                    <button onclick="window.gameInstance.escolher('Assassina', 'Imgs/Player/Assasin.png')">
                         Selecionar
                     </button>
-                    <div class="character-nome">Naya</div>
+                    <div class="character-nome">Assassina</div>
                     <div class="character-habilidade">D20. Acerta com 13+. Ignora 1º dano.</div>
-                    <img class="character-img" src="Imgs/Player/Naya.png" alt="Naya">
+                    <img class="character-img" src="Imgs/Player/Assasin.png" alt="Assassina">
                 </div>
             </div>
         </div>
@@ -78,7 +78,7 @@
                         <img src="Imgs/Enemy/Icon_EvilAI.png" alt="Foto IA" id="fotoIA">
                     </div>
                     <div class="hud-info">
-                        <div class="hud-nome" id="nomeIA">EVA</div>
+                        <div class="hud-nome" id="nomeIA">IA Maligna</div>
                         <div class="barra-vida">
                             <div id="vidaIABarra" class="vida-atual" style="width: 100%"></div>
                         </div>
@@ -87,109 +87,22 @@
                 </div>
             </div>
 
-            <!-- Personagem + Controles (mantidos juntos e responsivos) -->
-            <div class="player-controls">
-                <img id="playerCharacter" class="player-character" src="" alt="Personagem">
+            <!-- Imagem do Personagem -->
+            <img id="playerCharacter" class="player-character" src="" alt="Personagem">
 
-                <!-- Controles de Combate -->
-                <div class="combat-controls">
-                <!-- Linha de dados -->
-                <div class="control-row">
-                	<div class="control-col">
-                		<label for="dado">D20</label>
-                		<select id="dado">
-                    <!-- Opções de 0 a 20 -->
-                    <option value="0">0</option>
-                    <option value="1">1</option>
-                    <option value="2">2</option>
-                    <option value="3">3</option>
-                    <option value="4">4</option>
-                    <option value="5">5</option>
-                    <option value="6">6</option>
-                    <option value="7">7</option>
-                    <option value="8">8</option>
-                    <option value="9">9</option>
-                    <option value="10">10</option>
-                    <option value="11">11</option>
-                    <option value="12">12</option>
-                    <option value="13">13</option>
-                    <option value="14">14</option>
-                    <option value="15">15</option>
-                    <option value="16">16</option>
-                    <option value="17">17</option>
-                    <option value="18">18</option>
-                    <option value="19">19</option>
-                    <option value="20">20</option>
-                    </select>
-                </div>
-                <div class="control-col" id="dadoHackerCol" style="display:none;">
-                    <label for="dadoHacker">D12</label>
-                    <select id="dadoHacker">
-                        <!-- Opções de 0 a 12 -->
-                        <option value="0">0</option>
-                        <option value="1">1</option>
-                        <option value="2">2</option>
-                        <option value="3">3</option>
-                        <option value="4">4</option>
-                        <option value="5">5</option>
-                        <option value="6">6</option>
-                        <option value="7">7</option>
-                        <option value="8">8</option>
-                        <option value="9">9</option>
-                        <option value="10">10</option>
-                        <option value="11">11</option>
-                        <option value="12">12</option>
-                    </select>
-                </div>
-                </div>
-
-                <!-- Linha de atributos -->
-                <div class="control-row">
-                	<div class="control-col">
-                		<label for="nivelInput">Nivel</label>
-                		<select id="nivelInput">
-                        <option value="0">0</option>
-                        <option value="1">1</option>
-                        <option value="2">2</option>
-                        <option value="3">3</option>
-                        <option value="4">4</option>
-                        <option value="5">5</option>
-                        <option value="6">6</option>
-                        <option value="7">7</option>
-                        <option value="8">8</option>
-                        <option value="9">9</option>
-                        <option value="10">10</option>
-                    </select>
-                	</div>
-                	<div class="control-col">
-                		<label for="bonusInput">Bonus</label>
-                		<select id="bonusInput">
-                			<option value="0">0</option>
-                			<option value="1">1</option>
-                			<option value="2">2</option>
-                			<option value="3">3</option>
-                			<option value="4">4</option>
-                			<option value="5">5</option>
-                			<option value="6">6</option>
-                			<option value="7">7</option>
-                			<option value="8">8</option>
-                			<option value="9">9</option>
-                			<option value="10">10</option>
-                			<option value="11">11</option>
-                			<option value="12">12</option>
-                			<option value="13">13</option>
-                			<option value="14">14</option>
-                			<option value="15">15</option>
-                			<option value="16">16</option>
-                			<option value="17">17</option>
-                			<option value="18">18</option>
-                			<option value="19">19</option>
-                			<option value="20">20</option>
-                		</select>
-                	</div>
-                </div>
-
-                    <button id="confirmarDadoBtn">Confirmar Dado</button>
+            <!-- Controles de Combate -->
+            <div class="combat-controls">
+                <!-- Painel de Rolagem de Dados -->
+                <div class="dice-panel">
+                    <div class="dice-container">
+                        <div id="playerDiceAnimation" class="dice-animation hidden"></div>
+                        <span class="dice-label">D20</span>
+                    </div>
+                    <div class="dice-container hacker-only" style="display: none;">
+                        <div id="playerDiceAnimationHacker" class="dice-animation hidden"></div>
+                        <span class="dice-label">D12</span>
+                    </div>
+                    <button id="attackBtn" class="attack-btn">ATTACK</button>
                 </div>
             </div>
 
