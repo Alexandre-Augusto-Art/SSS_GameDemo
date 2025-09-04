@@ -12,14 +12,14 @@
     <div class="game-container">
         <div id="inicio">
             <img src="Imgs/Logo.png" alt="Logo" style="display:block;margin:90px auto 0 auto;max-width:60vw;max-height:60vh;">
-            <button id="iniciarBtn" style="position:fixed;bottom:48px;left:50%;transform:translateX(-50%);">Iniciar Missão</button>
+            <button id="iniciarBtn" class="nav-btn" style="position:fixed;bottom:48px;left:50%;transform:translateX(-50%);">Iniciar Missão</button>
         </div>
 
         <div id="escolha" class="hidden">
             <h2>Escolha seu personagem</h2>
             <div class="character-selection">
                 <div class="character-option">
-                    <button onclick="window.gameInstance.escolher('Sniper', 'Imgs/Player/Sniper.png')">
+                    <button class="nav-btn" onclick="window.gameInstance.escolher('Sniper', 'Imgs/Player/Sniper.png')">
                         Selecionar
                     </button>
                     <div class="character-nome">Sniper</div>
@@ -27,7 +27,7 @@
                     <img class="character-img" src="Imgs/Player/Sniper.png" alt="Sniper">
                 </div>
                 <div class="character-option">
-                    <button onclick="window.gameInstance.escolher('Hacker', 'Imgs/Player/Hacker.png')">
+                    <button class="nav-btn" onclick="window.gameInstance.escolher('Hacker', 'Imgs/Player/Hacker.png')">
                         Selecionar
                     </button>
                     <div class="character-nome">Hacker</div>
@@ -35,7 +35,7 @@
                     <img class="character-img" src="Imgs/Player/Hacker.png" alt="Hacker">
                 </div>
                 <div class="character-option">
-                    <button onclick="window.gameInstance.escolher('Assassina', 'Imgs/Player/Assasin.png')">
+                    <button class="nav-btn" onclick="window.gameInstance.escolher('Assassina', 'Imgs/Player/Assasin.png')">
                         Selecionar
                     </button>
                     <div class="character-nome">Assassina</div>
@@ -67,16 +67,23 @@
 
                 <!-- Centro - IA -->
                 <div class="ia-container">
-                    <img src="Imgs/Enemy/Base_EvilAI.gif" class="ia-image" id="iaNormal" alt="IA">
-                    <img src="Imgs/Enemy/Demage_EvilAI.gif" class="ia-damage" id="iaDano" alt="IA Dano">
+                    <!-- Drone (Andar 1) -->
+                    <img src="Imgs/Enemy/1-Drone/Drone_GameBattleImg.png" class="ia-image andar-1" id="droneNormal" alt="Drone">
+                    <img src="Imgs/Enemy/1-Drone/Drone_GameBattleImg.png" class="ia-damage andar-1" id="droneDano" alt="Drone Dano">
+                    
+                    <!-- K9 (Andar 2) -->
+                    <img src="Imgs/Enemy/2-K9/K9_GameBattleImg.png" class="ia-image andar-2 hidden" id="k9Normal" alt="K9">
+                    <img src="Imgs/Enemy/2-K9/K9_GameBattleImg.png" class="ia-damage andar-2 hidden" id="k9Dano" alt="K9 Dano">
+                    
+                    <!-- IA (Andar 3) -->
+                    <img src="Imgs/Enemy/3-AI/Base_EvilAI.gif" class="ia-image andar-3 hidden" id="iaNormal" alt="IA">
+                    <img src="Imgs/Enemy/3-AI/Demage_EvilAI.gif" class="ia-damage andar-3 hidden" id="iaDano" alt="IA Dano">
+                    
                     <div id="diceAnimation" class="dice-animation hidden"></div>
                 </div>
 
                 <!-- Status da IA -->
                 <div class="status-card ia">
-                    <div class="hud-foto">
-                        <img src="Imgs/Enemy/Icon_EvilAI.png" alt="Foto IA" id="fotoIA">
-                    </div>
                     <div class="hud-info">
                         <div class="hud-nome" id="nomeIA">IA Maligna</div>
                         <div class="barra-vida">
@@ -94,15 +101,24 @@
             <div class="combat-controls">
                 <!-- Painel de Rolagem de Dados -->
                 <div class="dice-panel">
-                    <div class="dice-container">
-                        <div id="playerDiceAnimation" class="dice-animation hidden"></div>
+                    <div id="playerDiceAnimation" class="dice-container">
                         <span class="dice-label">D20</span>
                     </div>
-                    <div class="dice-container hacker-only" style="display: none;">
-                        <div id="playerDiceAnimationHacker" class="dice-animation hidden"></div>
+                    <div id="playerDiceAnimationHacker" class="dice-container hacker-only" style="display: none;">
                         <span class="dice-label">D12</span>
                     </div>
                     <button id="attackBtn" class="attack-btn">ATTACK</button>
+                    <div class="hacker-controls hacker-only" style="display: none;">
+                        <div class="hack-button-container">
+                            <button id="hackBtn" class="hack-btn">HACK</button>
+                            <div id="hackBonus" class="hack-bonus-indicator hidden">+0</div>
+                        </div>
+                        <div class="hack-uses-indicator">
+                            <div class="hack-use-dot" id="hackUse1"></div>
+                            <div class="hack-use-dot" id="hackUse2"></div>
+                            <div class="hack-use-dot" id="hackUse3"></div>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -111,10 +127,65 @@
             <div id="resultadoIA" class="resultado-ataque hidden"></div>
         </div>
 
+        <div id="transicao" class="hidden">
+            <h2 id="mensagemTransicao"></h2>
+            <button id="proximoAndarBtn" class="nav-btn">Seguir para Próximo Andar</button>
+        </div>
+
         <div id="resultado" class="hidden">
             <h2 id="resultadoFinal"></h2>
             <p id="recompensa" class="hidden"></p>
-            <button id="reiniciarBtn" class="reiniciar-btn">Voltar ao Início</button>
+            <button id="reiniciarBtn" class="reiniciar-btn nav-btn">Voltar ao Início</button>
+        </div>
+    </div>
+
+    <!-- Modal de Hacking -->
+    <div id="hackingModal" class="hacking-modal hidden">
+        <div class="hacking-overlay"></div>
+        <div class="hacking-content">
+            <!-- Header do Modal -->
+            <div class="hacking-header">
+                <h2>BREACH PROTOCOL</h2>
+                <button id="closeHackingBtn" class="close-hacking-btn">&times;</button>
+            </div>
+            
+            <!-- Topbar com Timer e Buffer -->
+            <div class="bp-topbar">
+                <div class="bp-timer-block">
+                    <div class="bp-timer-label">TIME REMAINING</div>
+                    <div class="bp-timer-bar">
+                        <div class="bp-timer-bar-inner"></div>
+                    </div>
+                    <div class="bp-timer-value" id="hackTimerValue">30.00</div>
+                </div>
+                <div class="bp-buffer-block">
+                    <div class="bp-buffer-label">BUFFER</div>
+                    <div class="bp-buffer-boxes" id="hackBufferBoxes"></div>
+                </div>
+            </div>
+
+            <!-- Área Principal -->
+            <div class="bp-mainarea">
+                <!-- Painel da Matrix -->
+                <div class="bp-matrix-panel">
+                    <div class="panel-header">CODE MATRIX</div>
+                    <div class="bp-matrix-area">
+                        <table id="hackGrid" class="matrix"></table>
+                    </div>
+                </div>
+
+                <!-- Painel de Sequências -->
+                <div class="bp-hacks-panel">
+                    <div class="bp-hacks-label">SEQUENCE REQUIRED TO UPLOAD</div>
+                    <div class="bp-hack-list" id="hackList">
+                        <!-- Sequências serão geradas pelo JavaScript -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Mensagens de Resultado -->
+            <div id="hackWinMsg" class="hack-result-msg hidden">ACCESS GRANTED</div>
+            <div id="hackFailMsg" class="hack-result-msg hidden">ACCESS DENIED</div>
         </div>
     </div>
 
