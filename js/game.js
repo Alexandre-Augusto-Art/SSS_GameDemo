@@ -262,8 +262,9 @@ class Game {
             }
         }
 
-        // Reset do bônus após uso
+        // Reset do bônus e crítico após uso
         this.hackingBonus = 0;
+        this.hackingCritical = false; // Reseta o crítico após o ataque
 
         this.finalizarAtaque(acertou, dano, mensagemCentral);
     }
@@ -582,6 +583,7 @@ class Game {
         
         // Reset do hacking para o novo andar
         this.hackingBonus = 0;
+        this.hackingCritical = false;
         this.hackingUsesRemaining = 3;
         this.updateHackUsesIndicator();
         this.updateBonusIndicator(0);
@@ -648,6 +650,7 @@ class Game {
         this.ignorouDano = false;
         this.danoCausado = 0;
         this.currentFloor = 1;
+        this.hackingCritical = false;
         // Resetar interface
         document.getElementById("numeroTurno").textContent = "1";
         document.getElementById("vidaJogador").textContent = "3";
