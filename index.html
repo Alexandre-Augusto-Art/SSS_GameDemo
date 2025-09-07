@@ -31,7 +31,7 @@
                         Selecionar
                     </button>
                     <div class="character-nome">Hacker</div>
-                    <div class="character-habilidade">D20 + D12. Acerta com 16+.</div>
+                    <div class="character-habilidade">D20 + D4. Acerta com 11+.</div>
                     <img class="character-img" src="Imgs/Player/Hacker.png" alt="Hacker">
                 </div>
                 <div class="character-option">
@@ -90,12 +90,26 @@
                             <div id="vidaIABarra" class="vida-atual" style="width: 100%"></div>
                         </div>
                         <div class="hud-valor"><span id="vidaIA">3</span>/3</div>
+                        <div class="hud-difficulty"><span id="enemyDifficulty">11+</span> PARA ACERTAR</div>
                     </div>
                 </div>
             </div>
 
-            <!-- Imagem do Personagem -->
-            <img id="playerCharacter" class="player-character" src="" alt="Personagem">
+            <!-- Player Section -->
+            <div class="player-section">
+                <!-- Imagem do Personagem -->
+                <img id="playerCharacter" class="player-character" src="" alt="Personagem">
+                
+                <!-- Status do Jogador (lado esquerdo) -->
+                <div class="player-status-left">
+                    <div class="status-text">
+                        <div class="status-line">VS CIBERNÉTICOS: <span id="playerVsCyber">+0</span></div>
+                        <div class="status-line">VS BLINDADOS: <span id="playerVsArmored">+0</span></div>
+                        <div class="status-line">VS ORGÂNICOS: <span id="playerVsOrganic">+0</span></div>
+                    </div>
+                </div>
+            </div>
+            
 
             <!-- Controles de Combate -->
             <div class="combat-controls">
@@ -105,8 +119,12 @@
                         <span class="dice-label">D20</span>
                     </div>
                     <div id="playerDiceAnimationHacker" class="dice-container hacker-only" style="display: none;">
-                        <span class="dice-label">D12</span>
+                        <span class="dice-label">D4</span>
                     </div>
+                </div>
+                
+                <!-- Botões de Ação -->
+                <div class="action-buttons">
                     <button id="attackBtn" class="attack-btn">ATTACK</button>
                     <div class="hacker-controls hacker-only" style="display: none;">
                         <div class="hack-button-container">
@@ -127,9 +145,66 @@
             <div id="resultadoIA" class="resultado-ataque hidden"></div>
         </div>
 
+        <!-- Botão de Inventário (apenas nas batalhas) -->
+        <button id="inventoryBtn" class="inventory-btn">
+            <img src="Imgs/Elements/Inventory_Icon.png" alt="Inventário" class="inventory-icon-img">
+        </button>
+
         <div id="transicao" class="hidden">
             <h2 id="mensagemTransicao"></h2>
             <button id="proximoAndarBtn" class="nav-btn">Seguir para Próximo Andar</button>
+        </div>
+
+        <!-- Modal do Inventário -->
+        <div id="inventoryModal" class="inventory-modal hidden">
+            <div class="inventory-overlay"></div>
+            <div class="inventory-content">
+                <div class="inventory-header">
+                    <h2>Inventário</h2>
+                    <button id="closeInventoryBtn" class="close-inventory-btn">×</button>
+                </div>
+                
+                <div class="inventory-body">
+                    <!-- Inventário - Duas linhas -->
+                    <div class="inventory-section">
+                        <h3>Inventário</h3>
+                        <div class="inventory-grid" id="inventoryGrid">
+                            <!-- Itens serão inseridos aqui dinamicamente -->
+                        </div>
+                    </div>
+                    
+                    <!-- Equipamentos - Terceira linha -->
+                    <div class="equipment-section">
+                        <h3>Equipamentos</h3>
+                        <div class="equipment-slots">
+                            <div class="equipment-slot" data-slot="head">
+                                <div class="slot-label">Cabeça</div>
+                                <div class="slot-content" id="headSlot"></div>
+                            </div>
+                            <div class="equipment-slot" data-slot="leftHand">
+                                <div class="slot-label">Mão Esquerda</div>
+                                <div class="slot-content" id="leftHandSlot"></div>
+                            </div>
+                            <div class="equipment-slot" data-slot="rightHand">
+                                <div class="slot-label">Mão Direita</div>
+                                <div class="slot-content" id="rightHandSlot"></div>
+                            </div>
+                            <div class="equipment-slot" data-slot="torso">
+                                <div class="slot-label">Tronco</div>
+                                <div class="slot-content" id="torsoSlot"></div>
+                            </div>
+                            <div class="equipment-slot" data-slot="legs">
+                                <div class="slot-label">Pernas</div>
+                                <div class="slot-content" id="legsSlot"></div>
+                            </div>
+                            <div class="equipment-slot" data-slot="modifications">
+                                <div class="slot-label">Modificações</div>
+                                <div class="slot-content" id="modificationsSlot"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <div id="resultado" class="hidden">
@@ -189,6 +264,9 @@
         </div>
     </div>
 
+    <script src="js/systems/itemSystem.js"></script>
+    <script src="js/systems/inventorySystem.js"></script>
+    <script src="js/ui/inventoryUI.js"></script>
     <script src="js/game.js"></script>
 </body>
 </html> 

@@ -14,6 +14,11 @@ class Game {
         this.hackingCritical = false;
         this.currentFloor = 1;
         this.maxFloors = 3;
+        
+        // Sistema de inventário
+        this.inventorySystem = new InventorySystem();
+        this.inventoryUI = new InventoryUI(this.inventorySystem);
+        
         this.setupEventListeners();
         this.initializeUI();
     }
@@ -56,6 +61,13 @@ class Game {
             proximoAndarBtn.removeEventListener('click', this.proximoAndar);
             proximoAndarBtn.addEventListener('click', () => this.proximoAndar());
         }
+
+        // Event listener para o botão de inventário
+        const inventoryBtn = document.getElementById('inventoryBtn');
+        if (inventoryBtn) {
+            inventoryBtn.removeEventListener('click', this.abrirInventario);
+            inventoryBtn.addEventListener('click', () => this.abrirInventario());
+        }
     }
 
     initializeUI() {
@@ -64,6 +76,8 @@ class Game {
         if (hackingModal) {
             hackingModal.classList.add('hidden');
         }
+
+        // Botão de inventário agora é controlado apenas por CSS
 
         // Adiciona listener para fechar modal com ESC
         document.addEventListener('keydown', (e) => {
@@ -112,6 +126,8 @@ class Game {
     irParaEscolha() {
         document.getElementById("inicio").classList.add("hidden");
         document.getElementById("escolha").classList.remove("hidden");
+        
+        // Botão de inventário controlado por CSS
     }
 
     escolher(p, imagemSrc) {
@@ -119,6 +135,8 @@ class Game {
         this.personagemImagem = imagemSrc;
         document.getElementById("escolha").classList.add("hidden");
         document.getElementById("combate").classList.remove("hidden");
+        
+        // Botão de inventário controlado por CSS
         
         // Define a imagem do personagem
         const playerCharacter = document.getElementById("playerCharacter");
@@ -130,7 +148,13 @@ class Game {
         if (nomeJogador) nomeJogador.textContent = p;
         if (fotoJogador) fotoJogador.src = imagemSrc;
         
-        // Mostrar ou esconder a caixa D12 e botão HACK baseado no personagem
+        // Atualiza status do jogador
+        this.atualizarBarrasVida();
+        this.atualizarStatusAtaque();
+        this.atualizarStatusDetalhado();
+        this.atualizarDificuldadeInimigo();
+        
+        // Mostrar ou esconder a caixa D4 e botão HACK baseado no personagem
         const hackerElements = document.querySelectorAll('.hacker-only');
         hackerElements.forEach(element => {
             element.style.display = p === "Hacker" ? "flex" : "none";
@@ -157,6 +181,10 @@ class Game {
         if (fotoIA) fotoIA.src = "Imgs/Enemy/1-Drone/Drone_GameBattleImg.png";
         
         this.atualizarBarrasVida();
+        this.atualizarStatusAtaque();
+        this.atualizarDificuldadeInimigo();
+        this.atualizarResumoJogador();
+        this.atualizarResumoInimigo();
     }
 
     atualizarBarrasVida() {
@@ -168,6 +196,33 @@ class Game {
         
         document.getElementById("vidaJogadorBarra").style.width = `${porcentagemVidaJogador}%`;
         document.getElementById("vidaIABarra").style.width = `${porcentagemVidaIA}%`;
+    }
+
+    atualizarStatusAtaque() {
+        const enemyTags = this.getCurrentEnemyTags();
+        const itemBonus = this.inventorySystem.calculateAttackBonus(enemyTags);
+        const playerAttackPower = document.getElementById('playerAttackPower');
+        if (playerAttackPower) {
+            playerAttackPower.textContent = `+${itemBonus.total}`;
+        }
+    }
+
+    atualizarDificuldadeInimigo() {
+        const dificuldade = 11 + (this.currentFloor - 1) * 3;
+        const enemyDifficulty = document.getElementById('enemyDifficulty');
+        if (enemyDifficulty) {
+            enemyDifficulty.textContent = `${dificuldade}+`;
+        }
+    }
+
+    atualizarResumoJogador() {
+        // Método simplificado - o status agora é mostrado diretamente no lado esquerdo
+        // Apenas atualiza o poder de ataque que já é atualizado pelo atualizarStatusAtaque
+    }
+
+    atualizarResumoInimigo() {
+        // Método simplificado - o status do inimigo agora é mostrado diretamente no lado direito
+        // Apenas atualiza a dificuldade que já é atualizada pelo atualizarDificuldadeInimigo
     }
 
     processarAtaqueJogador() {
@@ -206,24 +261,55 @@ class Game {
     processarResultadoNormal() {
         // Pega o resultado do D20 que foi mostrado na caixa
         let dado = parseInt(document.getElementById('playerDiceAnimation').textContent);
+        if (isNaN(dado) || dado < 1 || dado > 20) {
+            dado = Math.floor(Math.random() * 20) + 1; // Garante 1-20
+        }
         let ataqueTotal = dado;
         let mensagemCentral = '';
         let tipoMensagem = '';
         let acertou = false;
         let dano = 1; // Dano padrão
 
+        // Bônus dos itens equipados
+        const enemyTags = this.getCurrentEnemyTags();
+        const itemBonus = this.inventorySystem.calculateAttackBonus(enemyTags);
+        if (itemBonus.total > 0) {
+            ataqueTotal += itemBonus.total;
+        }
+
+        // Calcula dificuldade baseada no andar (11 + (andar-1)*3)
+        const dificuldade = 11 + (this.currentFloor - 1) * 3;
+
         // Verifica acerto crítico
         if (dado === 20) {
             dano = 2;
-            mensagemCentral = `ACERTO CRÍTICO! (D20: ${dado})`;
+            mensagemCentral = `ACERTO CRÍTICO! (D20: ${dado}`;
+            if (itemBonus.total > 0) {
+                mensagemCentral += ` + Itens: ${itemBonus.total}`;
+            }
+            mensagemCentral += ` = ${ataqueTotal})`;
             acertou = true;
         } else if (this.personagem === "Sniper") {
             ataqueTotal = dado + 3;
-            if (ataqueTotal >= 11) acertou = true;
-            mensagemCentral = acertou ? `Sniper acertou! (D20: ${dado} + 3 = ${ataqueTotal})` : `Sniper errou. (D20: ${dado} + 3 = ${ataqueTotal})`;
+            if (itemBonus.total > 0) {
+                ataqueTotal += itemBonus.total;
+            }
+            if (ataqueTotal >= dificuldade) acertou = true;
+            mensagemCentral = acertou ? `Sniper acertou! (D20: ${dado} + 3` : `Sniper errou. (D20: ${dado} + 3`;
+            if (itemBonus.total > 0) {
+                mensagemCentral += ` + Itens: ${itemBonus.total}`;
+            }
+            mensagemCentral += ` = ${ataqueTotal})`;
         } else if (this.personagem === "Assassina") {
-            if (dado >= 13) acertou = true;
-            mensagemCentral = acertou ? `Assassina acertou! (D20: ${dado})` : `Assassina errou. (D20: ${dado})`;
+            if (itemBonus.total > 0) {
+                ataqueTotal += itemBonus.total;
+            }
+            if (ataqueTotal >= dificuldade) acertou = true;
+            mensagemCentral = acertou ? `Assassina acertou! (D20: ${dado}` : `Assassina errou. (D20: ${dado}`;
+            if (itemBonus.total > 0) {
+                mensagemCentral += ` + Itens: ${itemBonus.total}`;
+            }
+            mensagemCentral += ` = ${ataqueTotal})`;
         }
 
         this.finalizarAtaque(acertou, dano, mensagemCentral);
@@ -232,34 +318,48 @@ class Game {
     processarResultadoHacker() {
         // Pega os resultados dos dados que foram mostrados nas caixas
         let dadoD20 = parseInt(document.getElementById('playerDiceAnimation').textContent);
-        let dadoD12 = parseInt(document.getElementById('playerDiceAnimationHacker').textContent);
-        let ataqueTotal = dadoD20 + dadoD12 + this.hackingBonus; // ADICIONA BÔNUS DE HACKING
-        let acertou = ataqueTotal >= 16; // Novo requisito: 16+
+        let dadoD4 = parseInt(document.getElementById('playerDiceAnimationHacker').textContent);
+        
+        if (isNaN(dadoD20) || dadoD20 < 1 || dadoD20 > 20) {
+            dadoD20 = Math.floor(Math.random() * 20) + 1; // Garante 1-20
+        }
+        if (isNaN(dadoD4) || dadoD4 < 1 || dadoD4 > 4) {
+            dadoD4 = Math.floor(Math.random() * 4) + 1; // Garante 1-4
+        }
+        let ataqueTotal = dadoD20 + dadoD4 + this.hackingBonus; // ADICIONA BÔNUS DE HACKING
+        
+        // Bônus dos itens equipados
+        const enemyTags = this.getCurrentEnemyTags();
+        const itemBonus = this.inventorySystem.calculateAttackBonus(enemyTags);
+        if (itemBonus.total > 0) {
+            ataqueTotal += itemBonus.total;
+        }
+        
+        // Calcula dificuldade baseada no andar (11 + (andar-1)*3)
+        const dificuldade = 11 + (this.currentFloor - 1) * 3;
+        let acertou = ataqueTotal >= dificuldade;
         let dano = 1;
         let mensagemCentral = '';
 
         if (dadoD20 === 20 || this.hackingCritical) {
             dano = 2;
             if (dadoD20 === 20) {
-                mensagemCentral = this.hackingBonus > 0 
-                    ? `ACERTO CRÍTICO! (D20: ${dadoD20} + D12: ${dadoD12} + HACK: ${this.hackingBonus} = ${ataqueTotal})`
-                    : `ACERTO CRÍTICO! (D20: ${dadoD20} + D12: ${dadoD12} = ${ataqueTotal})`;
+                mensagemCentral = `ACERTO CRÍTICO! (D20: ${dadoD20} + D4: ${dadoD4}`;
+                if (this.hackingBonus > 0) mensagemCentral += ` + HACK: ${this.hackingBonus}`;
+                if (itemBonus.total > 0) mensagemCentral += ` + Itens: ${itemBonus.total}`;
+                mensagemCentral += ` = ${ataqueTotal})`;
             } else {
-                mensagemCentral = this.hackingBonus > 0 
-                    ? `HACK PERFEITO! DANO CRÍTICO! (D20: ${dadoD20} + D12: ${dadoD12} + HACK: ${this.hackingBonus} = ${ataqueTotal})`
-                    : `HACK PERFEITO! DANO CRÍTICO! (D20: ${dadoD20} + D12: ${dadoD12} = ${ataqueTotal})`;
+                mensagemCentral = `HACK PERFEITO! DANO CRÍTICO! (D20: ${dadoD20} + D4: ${dadoD4}`;
+                if (this.hackingBonus > 0) mensagemCentral += ` + HACK: ${this.hackingBonus}`;
+                if (itemBonus.total > 0) mensagemCentral += ` + Itens: ${itemBonus.total}`;
+                mensagemCentral += ` = ${ataqueTotal})`;
             }
             acertou = true;
         } else {
-            if (this.hackingBonus > 0) {
-                mensagemCentral = acertou 
-                    ? `Hacker acertou! (D20: ${dadoD20} + D12: ${dadoD12} + HACK: ${this.hackingBonus} = ${ataqueTotal})`
-                    : `Hacker errou. (D20: ${dadoD20} + D12: ${dadoD12} + HACK: ${this.hackingBonus} = ${ataqueTotal})`;
-            } else {
-                mensagemCentral = acertou 
-                    ? `Hacker acertou! (D20: ${dadoD20} + D12: ${dadoD12} = ${ataqueTotal})`
-                    : `Hacker errou. (D20: ${dadoD20} + D12: ${dadoD12} = ${ataqueTotal})`;
-            }
+            mensagemCentral = acertou ? `Hacker acertou! (D20: ${dadoD20} + D4: ${dadoD4}` : `Hacker errou. (D20: ${dadoD20} + D4: ${dadoD4}`;
+            if (this.hackingBonus > 0) mensagemCentral += ` + HACK: ${this.hackingBonus}`;
+            if (itemBonus.total > 0) mensagemCentral += ` + Itens: ${itemBonus.total}`;
+            mensagemCentral += ` = ${ataqueTotal})`;
         }
 
         // Reset do bônus e crítico após uso
@@ -267,6 +367,16 @@ class Game {
         this.hackingCritical = false; // Reseta o crítico após o ataque
 
         this.finalizarAtaque(acertou, dano, mensagemCentral);
+    }
+
+    // Retorna as tags do inimigo atual
+    getCurrentEnemyTags() {
+        switch(this.currentFloor) {
+            case 1: return ['cibernetico']; // Drone
+            case 2: return ['organico']; // K9
+            case 3: return ['cibernetico']; // IA Maligna
+            default: return [];
+        }
     }
 
     finalizarAtaque(acertou, dano, mensagemCentral) {
@@ -313,7 +423,7 @@ class Game {
         let interval;
         let count = 0;
         interval = setInterval(() => {
-            diceEl.textContent = Math.ceil(Math.random() * 6);
+            diceEl.textContent = Math.floor(Math.random() * 20) + 1; // Garante 1-20
             count++;
             if (count > 10) {
                 clearInterval(interval);
@@ -336,7 +446,7 @@ class Game {
         let count = 0;
         let lastNumber;
         interval = setInterval(() => {
-            lastNumber = Math.ceil(Math.random() * 20);
+            lastNumber = Math.floor(Math.random() * 20) + 1; // Garante 1-20
             diceEl.textContent = lastNumber;
             count++;
             if (count > 15) {
@@ -360,7 +470,7 @@ class Game {
         let count = 0;
         let lastNumber;
         interval = setInterval(() => {
-            lastNumber = Math.ceil(Math.random() * 12);
+            lastNumber = Math.floor(Math.random() * 4) + 1; // Garante 1-4
             diceEl.textContent = lastNumber;
             count++;
             if (count > 12) {
@@ -440,7 +550,7 @@ class Game {
 
     iniciarAtaqueIA() {
         // Simula a rolagem do dado da IA
-        const ataqueIA = Math.ceil(Math.random() * 20); // D20
+        const ataqueIA = Math.floor(Math.random() * 20) + 1; // D20 (1-20)
         let mensagemCentral = '';
         let tipoMensagem = '';
         let resultadoIA = '';
@@ -542,11 +652,34 @@ class Game {
         const playerAttackMessage = document.getElementById('playerAttackMessage');
         if (playerAttackMessage) playerAttackMessage.classList.add('hidden');
 
+        // Animações de destruição de cartas
+        this.animarDestruicaoCartas();
+
+        // Se derrotou o inimigo, adiciona item específico do andar ao inventário
+        if (this.vidaIA <= 0) {
+            setTimeout(() => {
+                if (this.currentFloor === 2) {
+                    // Segundo andar: ganha rifle + scope
+                    this.inventoryUI.addSecondFloorItemsToInventory();
+                } else {
+                    // Outros andares: item único
+                    const itemId = this.inventorySystem.generateFloorItem(this.currentFloor);
+                    if (itemId) {
+                        this.inventoryUI.addItemToInventory(itemId);
+                    }
+                }
+            }, 1000); // Aguarda a animação de destruição
+        }
+
+        // Botão de inventário controlado por CSS
+
         // Se derrotou o inimigo e não é o último andar, mostra tela de transição
         if (this.vidaIA <= 0 && this.currentFloor < this.maxFloors) {
             document.getElementById("combate").classList.add("hidden");
             document.getElementById("transicao").classList.remove("hidden");
             document.getElementById("mensagemTransicao").textContent = `Parabéns! Seguindo para o Andar ${this.currentFloor + 1}`;
+            
+            // Botão de inventário controlado por CSS
         } else {
             // Se morreu ou é o último andar, mostra tela de resultado final
             document.getElementById("combate").classList.add("hidden");
@@ -554,6 +687,8 @@ class Game {
             // Esconde o botão de recompensa
             const btnRecompensa = document.getElementById("sortearRecompensaBtn");
             if (btnRecompensa) btnRecompensa.style.display = "none";
+            
+            // Botão de inventário controlado por CSS
             // Exibe título e mensagem hacker customizada
             const resultadoFinal = document.getElementById("resultadoFinal");
             const recompensaElement = document.getElementById("recompensa");
@@ -588,9 +723,22 @@ class Game {
         this.updateHackUsesIndicator();
         this.updateBonusIndicator(0);
         
-        // Esconde tela de transição
-        document.getElementById("transicao").classList.add("hidden");
-        document.getElementById("combate").classList.remove("hidden");
+        // Anima a destruição da carta do inimigo anterior e mostra a nova
+        this.animarTransicaoAndar();
+        
+        // Esconde tela de transição após animação
+        setTimeout(() => {
+            document.getElementById("transicao").classList.add("hidden");
+            document.getElementById("combate").classList.remove("hidden");
+            
+            // Botão de inventário controlado por CSS
+            
+            // Atualiza status do jogador
+            this.atualizarBarrasVida();
+            this.atualizarStatusAtaque();
+            this.atualizarStatusDetalhado();
+            this.atualizarDificuldadeInimigo();
+        }, 2000);
 
         // Atualiza inimigo visível
         document.querySelectorAll('.ia-image, .ia-damage').forEach(img => {
@@ -625,8 +773,12 @@ class Game {
         // Atualiza número do turno
         document.getElementById("numeroTurno").textContent = this.turno;
 
-        // Atualiza barras de vida
+        // Atualiza barras de vida e status
         this.atualizarBarrasVida();
+        this.atualizarStatusAtaque();
+        this.atualizarDificuldadeInimigo();
+        this.atualizarResumoJogador();
+        this.atualizarResumoInimigo();
     }
 
     sortearRecompensa() {
@@ -651,6 +803,9 @@ class Game {
         this.danoCausado = 0;
         this.currentFloor = 1;
         this.hackingCritical = false;
+        
+        // Resetar inventário
+        this.inventorySystem.resetInventory();
         // Resetar interface
         document.getElementById("numeroTurno").textContent = "1";
         document.getElementById("vidaJogador").textContent = "3";
@@ -672,6 +827,8 @@ class Game {
         document.getElementById("escolha").classList.add("hidden");
         document.getElementById("transicao").classList.add("hidden");
         document.getElementById("inicio").classList.remove("hidden");
+        
+        // Botão de inventário controlado por CSS
         // Limpar imagem do personagem
         document.getElementById("playerCharacter").src = "";
         
@@ -701,6 +858,12 @@ class Game {
         const fotoIA = document.getElementById("fotoIA");
         if (nomeIA) nomeIA.textContent = "Drone";
         if (fotoIA) fotoIA.src = "Imgs/Enemy/1-Drone/Drone_GameBattleImg.png";
+    }
+
+    // === MÉTODOS DO INVENTÁRIO ===
+    
+    abrirInventario() {
+        this.inventoryUI.openInventory();
     }
 
     // === MÉTODOS DO MINI-JOGO DE HACKING ===
@@ -985,6 +1148,88 @@ class Game {
         if (hackFailMsg) hackFailMsg.classList.add('hidden');
         if (hackTimerValue) hackTimerValue.textContent = '30.00';
         if (timerBarInner) timerBarInner.style.width = '100%';
+    }
+
+    animarDestruicaoCartas() {
+        // Anima a destruição da carta do inimigo
+        const enemyImages = document.querySelectorAll('.ia-image:not(.hidden)');
+        enemyImages.forEach(img => {
+            img.classList.add('card-destroying');
+        });
+
+        // Anima a destruição das cartas de item do jogador (se houver)
+        const playerCards = document.querySelectorAll('.item-card');
+        playerCards.forEach((card, index) => {
+            setTimeout(() => {
+                card.classList.add('card-destroying');
+            }, index * 200); // Delay entre cada carta
+        });
+    }
+
+    animarTransicaoAndar() {
+        // Anima a destruição da carta do inimigo anterior
+        const enemyImages = document.querySelectorAll('.ia-image:not(.hidden)');
+        enemyImages.forEach(img => {
+            img.classList.add('card-destroying');
+        });
+
+        // Mostra a nova carta do inimigo após a destruição
+        setTimeout(() => {
+            document.querySelectorAll('.ia-image, .ia-damage').forEach(img => {
+                img.classList.remove('card-destroying');
+                img.classList.add('hidden');
+            });
+            document.querySelectorAll(`.andar-${this.currentFloor}`).forEach(img => {
+                img.classList.remove('hidden');
+            });
+        }, 1000);
+    }
+
+    atualizarStatusAtaque() {
+        const attackPower = this.inventorySystem.itemSystem.calculateAttackBonus();
+        const playerAttackPower = document.getElementById('playerAttackPower');
+        if (playerAttackPower) {
+            playerAttackPower.textContent = `+${attackPower}`;
+        }
+    }
+
+    atualizarStatusDetalhado() {
+        // Calcular bônus contra diferentes tipos de inimigos
+        const bonuses = this.inventorySystem.itemSystem.calculateAttackBonus();
+        const equippedItems = this.inventorySystem.getEquippedItems();
+        
+        let vsCyber = 0;
+        let vsArmored = 0;
+        let vsOrganic = 0;
+        
+        // Calcular bônus específicos
+        Object.values(equippedItems).forEach(item => {
+            if (item && !Array.isArray(item)) {
+                if (item.bonuses) {
+                    vsCyber += item.bonuses.cibernetico || 0;
+                    vsArmored += item.bonuses.blindado || 0;
+                    vsOrganic += item.bonuses.organico || 0;
+                }
+            } else if (Array.isArray(item)) {
+                // Modificações
+                item.forEach(mod => {
+                    if (mod && mod.bonuses) {
+                        vsCyber += mod.bonuses.cibernetico || 0;
+                        vsArmored += mod.bonuses.blindado || 0;
+                        vsOrganic += mod.bonuses.organico || 0;
+                    }
+                });
+            }
+        });
+        
+        // Atualizar elementos
+        const playerVsCyber = document.getElementById('playerVsCyber');
+        const playerVsArmored = document.getElementById('playerVsArmored');
+        const playerVsOrganic = document.getElementById('playerVsOrganic');
+        
+        if (playerVsCyber) playerVsCyber.textContent = `+${vsCyber}`;
+        if (playerVsArmored) playerVsArmored.textContent = `+${vsArmored}`;
+        if (playerVsOrganic) playerVsOrganic.textContent = `+${vsOrganic}`;
     }
 }
 

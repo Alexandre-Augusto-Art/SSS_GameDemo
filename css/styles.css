@@ -423,15 +423,75 @@ h1, h2, h3, label, .turno-info {
   pointer-events: none;
 }
 
+/* === LAYOUT ANTERIOR FUNCIONANDO === */
+.player-section {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  display: flex;
+  align-items: flex-end;
+  z-index: 2;
+}
+
+.player-status-left {
+  position: absolute;
+  left: 20px;
+  bottom: 250px;
+  z-index: 10;
+}
+
+.status-text {
+  color: #ffffff;
+  font-family: 'Rajdhani Medium', 'Rajdhani', Arial, sans-serif;
+  font-size: 0.7em;
+  font-weight: bold;
+  text-shadow: 0 0 10px #00fff7;
+  line-height: 1.4;
+  background: rgba(0, 0, 0, 0.3);
+  padding: 8px 12px;
+  border-radius: 4px;
+}
+
+.status-line {
+  margin-bottom: 5px;
+}
+
+.enemy-status-right {
+  position: absolute;
+  right: 20px;
+  bottom: 250px;
+  z-index: 10;
+}
+
+.enemy-status-right .status-text {
+  color: #ffffff;
+  text-shadow: 0 0 10px #ff003c;
+  background: rgba(0, 0, 0, 0.3);
+  padding: 8px 12px;
+  border-radius: 4px;
+}
+
 .combat-controls {
   position: absolute;
-  bottom: 70px; /* Movido 50px para baixo (era 120px) */
-  left: 270px;
+  bottom: 70px;
+  left: 300px;
   display: flex;
   flex-direction: column;
-  align-items: center;
+  align-items: flex-start;
   gap: 20px;
   z-index: 5;
+}
+
+.dice-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.action-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
 }
 
 .combat-controls label {
@@ -1449,4 +1509,535 @@ table.matrix td {
   color: #ff003c;
   text-shadow: 0 0 20px #ff003c;
   box-shadow: 0 0 40px #ff003c99;
+}
+
+/* === ESTILOS DO INVENTÁRIO === */
+.inventory-btn {
+  position: fixed;
+  bottom: 20px;
+  left: 20px;
+  width: 60px;
+  height: 60px;
+  background: transparent;
+  border: 2px solid #00fff7;
+  border-radius: 4px;
+  cursor: pointer;
+  display: none; /* Escondido por padrão */
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  z-index: 1000;
+  padding: 0;
+  box-shadow: 0 0 15px rgba(0, 255, 247, 0.3);
+}
+
+.inventory-btn:hover {
+  background: rgba(0, 255, 247, 0.1);
+  border-color: #00fff7;
+  box-shadow: 0 0 25px rgba(0, 255, 247, 0.6);
+  transform: scale(1.05);
+}
+
+.inventory-btn:active {
+  transform: scale(0.95);
+}
+
+.inventory-icon-img {
+  width: 40px;
+  height: 40px;
+  object-fit: contain;
+  filter: brightness(0) saturate(100%) invert(100%) sepia(100%) saturate(0%) hue-rotate(180deg) brightness(100%) contrast(100%);
+  transition: all 0.3s ease;
+}
+
+.inventory-btn:hover .inventory-icon-img {
+  filter: brightness(0) saturate(100%) invert(100%) sepia(100%) saturate(0%) hue-rotate(180deg) brightness(100%) contrast(100%);
+}
+
+/* Mostrar botão apenas durante combate */
+#combate:not(.hidden) ~ .inventory-btn {
+  display: flex;
+}
+
+.inventory-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.inventory-modal.hidden {
+  display: none !important;
+}
+
+.inventory-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.95);
+  backdrop-filter: blur(5px);
+}
+
+.inventory-content {
+  position: relative;
+  width: 90vw;
+  height: 80vh;
+  max-width: 1200px;
+  max-height: 800px;
+  background: #000000;
+  border: 3px solid #00fff7;
+  border-radius: 0;
+  box-shadow: 0 0 40px #00fff799;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.inventory-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 25px;
+  background: rgba(0, 255, 247, 0.1);
+  border-bottom: 2px solid #00fff7;
+}
+
+.inventory-header h2 {
+  margin: 0;
+  color: #00fff7;
+  font-family: 'Rajdhani Medium', 'Rajdhani', Arial, sans-serif;
+  font-size: 1.8em;
+  text-shadow: 0 0 12px #00fff7;
+  letter-spacing: 3px;
+}
+
+.close-inventory-btn {
+  background: #00fff7;
+  border: 2px solid #00fff7;
+  color: #000;
+  border-radius: 0;
+  font-size: 1.5em;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+  box-shadow: 0 0 16px #00fff7, 0 0 4.8px #ff003c;
+  width: 40px;
+  height: 40px;
+  line-height: 0;
+}
+
+.close-inventory-btn:hover {
+  background: rgba(0, 0, 0, 0.9);
+  color: #ff003c;
+  border-color: #ff003c;
+  box-shadow: 0 0 19.2px #ff003c, 0 0 6.4px #00fff7;
+  transform: scale(1.05);
+}
+
+.inventory-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
+  gap: 20px;
+  overflow: auto;
+  max-height: calc(80vh - 120px);
+}
+
+.equipment-section {
+  flex: 0 0 auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.equipment-section h3 {
+  color: #00fff7;
+  font-family: 'Rajdhani Medium', 'Rajdhani', Arial, sans-serif;
+  font-size: 1.3em;
+  text-shadow: 0 0 8px #00fff7;
+  margin-bottom: 15px;
+  text-align: center;
+}
+
+.equipment-slots {
+  display: flex;
+  flex-direction: row;
+  gap: 10px;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+}
+
+.equipment-slot {
+  background: rgba(0, 255, 247, 0.05);
+  border: 2px solid rgba(0, 255, 247, 0.3);
+  border-radius: 0;
+  padding: 10px;
+  min-height: 80px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.equipment-slot:hover {
+  border-color: #00fff7;
+  background: rgba(0, 255, 247, 0.1);
+}
+
+.slot-label {
+  color: #00fff7;
+  font-family: 'Rajdhani Medium', 'Rajdhani', Arial, sans-serif;
+  font-size: 0.9em;
+  text-shadow: 0 0 4px #00fff7;
+  margin-bottom: 5px;
+  text-align: center;
+}
+
+.slot-content {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+}
+
+.item-card {
+  background: rgba(0, 255, 247, 0.1);
+  border: 2px solid #00fff7;
+  border-radius: 0;
+  padding: 8px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  min-height: 60px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.item-card:hover {
+  background: rgba(0, 255, 247, 0.2);
+  border-color: #ff003c;
+  transform: scale(1.05);
+}
+
+.item-card img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 1;
+}
+
+.item-card .item-name {
+  color: #00fff7;
+  font-family: 'Rajdhani Medium', 'Rajdhani', Arial, sans-serif;
+  font-size: 0.8em;
+  text-shadow: 0 0 4px #00fff7;
+  text-align: center;
+  position: relative;
+  z-index: 2;
+  background: rgba(0, 0, 0, 0.7);
+  padding: 2px 4px;
+  border-radius: 2px;
+}
+
+.inventory-section {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.inventory-section h3 {
+  color: #00fff7;
+  font-family: 'Rajdhani Medium', 'Rajdhani', Arial, sans-serif;
+  font-size: 1.3em;
+  text-shadow: 0 0 8px #00fff7;
+  margin-bottom: 15px;
+  text-align: center;
+}
+
+.inventory-grid {
+  display: grid;
+  grid-template-columns: repeat(10, 1fr);
+  grid-template-rows: repeat(2, 1fr);
+  gap: 10px;
+  overflow-y: auto;
+  flex: 1;
+  padding: 10px;
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(0, 255, 247, 0.2);
+  min-height: 120px;
+}
+
+.empty-slot {
+  background: rgba(0, 255, 247, 0.05);
+  border: 2px dashed rgba(0, 255, 247, 0.3);
+  border-radius: 0;
+  min-height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: rgba(0, 255, 247, 0.5);
+  font-family: 'Rajdhani Medium', 'Rajdhani', Arial, sans-serif;
+  font-size: 0.8em;
+}
+
+/* === ESTILOS DOS STATUS DE ATAQUE === */
+.attack-status {
+  background: rgba(0, 255, 247, 0.15);
+  border: 2px solid #00fff7;
+  border-radius: 0;
+  padding: 8px 16px;
+  margin: 10px 18px;
+  min-width: 200px;
+  max-width: 300px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 0 12px #00fff744;
+}
+
+.player-attack-status {
+  background: rgba(0, 255, 247, 0.15);
+  border-color: #00fff7;
+}
+
+.enemy-difficulty-status {
+  background: rgba(255, 0, 60, 0.15);
+  border-color: #ff003c;
+  box-shadow: 0 0 12px #ff003c44;
+}
+
+.attack-status-label {
+  color: #00fff7;
+  font-family: 'Rajdhani Medium', 'Rajdhani', Arial, sans-serif;
+  font-size: 0.8em;
+  text-shadow: 0 0 4px #00fff7;
+  margin-bottom: 4px;
+  text-align: center;
+  letter-spacing: 1px;
+}
+
+.enemy-difficulty-status .attack-status-label {
+  color: #ff003c;
+  text-shadow: 0 0 4px #ff003c;
+}
+
+.attack-status-value {
+  color: #00fff7;
+  font-family: 'Rajdhani Medium', 'Rajdhani', Arial, sans-serif;
+  font-size: 1.4em;
+  font-weight: bold;
+  text-shadow: 0 0 8px #00fff7;
+  text-align: center;
+}
+
+.enemy-difficulty-status .attack-status-value {
+  color: #ff003c;
+  text-shadow: 0 0 8px #ff003c;
+}
+
+/* === ESTILOS PARA DESTAQUE DE CARTAS === */
+.item-card.highlighted {
+  background: rgba(0, 255, 247, 0.3);
+  border-color: #ff003c;
+  transform: scale(1.1);
+  box-shadow: 0 0 20px #ff003c99;
+  z-index: 10;
+}
+
+/* === ANIMAÇÕES DE DESTRUIÇÃO === */
+@keyframes card-destroy {
+  0% {
+    opacity: 1;
+    transform: scale(1) rotate(0deg);
+  }
+  50% {
+    opacity: 0.5;
+    transform: scale(1.2) rotate(180deg);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(0) rotate(360deg);
+  }
+}
+
+.card-destroying {
+  animation: card-destroy 1s ease-in-out forwards;
+}
+
+/* === ESTILOS DOS RESUMOS DE STATUS === */
+.status-summary {
+  background: rgba(0, 0, 0, 0.8);
+  border: 2px solid #00fff7;
+  border-radius: 0;
+  padding: 12px 16px;
+  margin: 10px 18px;
+  min-width: 250px;
+  max-width: 350px;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 0 12px #00fff744;
+}
+
+.player-status-summary {
+  border-color: #00fff7;
+}
+
+.enemy-status-summary {
+  border-color: #ff003c;
+  box-shadow: 0 0 12px #ff003c44;
+}
+
+.status-summary-title {
+  color: #00fff7;
+  font-family: 'Rajdhani Medium', 'Rajdhani', Arial, sans-serif;
+  font-size: 1.1em;
+  font-weight: bold;
+  text-shadow: 0 0 6px #00fff7;
+  margin-bottom: 8px;
+  text-align: center;
+  letter-spacing: 1px;
+}
+
+.enemy-status-summary .status-summary-title {
+  color: #ff003c;
+  text-shadow: 0 0 6px #ff003c;
+}
+
+.status-summary-content {
+  color: #fff;
+  font-family: 'Rajdhani Medium', 'Rajdhani', Arial, sans-serif;
+  font-size: 0.9em;
+  line-height: 1.4;
+  text-align: left;
+  opacity: 0.9;
+}
+
+/* === BOTÃO DE INVENTÁRIO APENAS ÍCONE === */
+.inventory-btn {
+  position: fixed;
+  bottom: 15px;
+  left: 15px;
+  width: 40px;
+  height: 40px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  display: none;
+  padding: 0;
+  margin: 0;
+  z-index: 1000;
+  pointer-events: auto;
+}
+
+.inventory-btn:hover {
+  transform: scale(1.1);
+}
+
+.inventory-btn:active {
+  transform: scale(0.95);
+}
+
+.inventory-icon-img {
+  width: 40px;
+  height: 40px;
+  object-fit: contain;
+  display: block;
+  filter: none;
+  transition: transform 0.2s ease;
+}
+
+/* Forçar posição no canto com margem */
+body #inventoryBtn {
+  position: fixed !important;
+  bottom: 15px !important;
+  left: 15px !important;
+  z-index: 1000 !important;
+}
+
+/* Mostrar apenas durante o combate */
+#combate:not(.hidden) ~ .inventory-btn {
+  display: block;
+}
+
+/* Dificuldade do inimigo na HUD */
+.hud-difficulty {
+  color: #ff6b6b;
+  font-size: 0.8em;
+  font-weight: bold;
+  text-align: center;
+  margin-top: 5px;
+  text-shadow: 0 0 5px rgba(255, 107, 107, 0.5);
+}
+
+/* === COMPORTAMENTO DRAG AND DROP === */
+.item-card {
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.item-card:hover {
+  transform: scale(1.05);
+}
+
+.item-card.dragging {
+  transform: scale(1.2);
+  z-index: 1000;
+  opacity: 0.8;
+}
+
+.item-card.reading {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(1.5);
+  z-index: 1001;
+  background: rgba(0, 0, 0, 0.9);
+  border: 2px solid #00fff7;
+  border-radius: 8px;
+  padding: 10px;
+  box-shadow: 0 0 30px rgba(0, 255, 247, 0.8);
+}
+
+.equipment-slot.drag-over {
+  background: rgba(0, 255, 247, 0.2);
+  border-color: #00fff7;
+  box-shadow: 0 0 15px rgba(0, 255, 247, 0.5);
+}
+
+/* === MODIFICAÇÕES NO MESMO SLOT === */
+.equipment-slot .modifications {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-top: 5px;
+}
+
+.equipment-slot .modification-item {
+  background: rgba(0, 255, 247, 0.1);
+  border: 1px solid #00fff7;
+  border-radius: 2px;
+  padding: 2px 4px;
+  font-size: 0.7em;
+  color: #00fff7;
+  text-align: center;
 } 
